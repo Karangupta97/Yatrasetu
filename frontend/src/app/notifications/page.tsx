@@ -15,42 +15,42 @@ import {
 
 /* ── Helpers ──────────────────────────────────────────────── */
 const TYPE_ICON: Record<NotifType, React.ReactNode> = {
-  success: <CheckCircle  size={18} style={{ color: "#16a34a" }} />,
+  success: <CheckCircle size={18} style={{ color: "#16a34a" }} />,
   warning: <AlertTriangle size={18} style={{ color: "#d97706" }} />,
-  info:    <Info          size={18} style={{ color: "#748efe" }} />,
-  error:   <XCircle      size={18} style={{ color: "#dc2626" }} />,
+  info: <Info size={18} style={{ color: "#748efe" }} />,
+  error: <XCircle size={18} style={{ color: "#dc2626" }} />,
 };
 
 const TYPE_RING: Record<NotifType, string> = {
   success: "#f0fdf4",
   warning: "#fffbeb",
-  info:    "#eff6ff",
-  error:   "#fef2f2",
+  info: "#eff6ff",
+  error: "#fef2f2",
 };
 
 const TYPE_DOT: Record<NotifType, string> = {
   success: "#16a34a",
   warning: "#d97706",
-  info:    "#748efe",
-  error:   "#dc2626",
+  info: "#748efe",
+  error: "#dc2626",
 };
 
 const CAT_ICON: Record<Notification["category"], React.ReactNode> = {
-  booking:  <ShoppingBag size={13} />,
-  payment:  <CreditCard  size={13} />,
-  refund:   <RotateCcw   size={13} />,
-  alert:    <AlertCircle size={13} />,
-  offer:    <Tag         size={13} />,
-  account:  <User        size={13} />,
+  booking: <ShoppingBag size={13} />,
+  payment: <CreditCard size={13} />,
+  refund: <RotateCcw size={13} />,
+  alert: <AlertCircle size={13} />,
+  offer: <Tag size={13} />,
+  account: <User size={13} />,
 };
 
 const CAT_COLOR: Record<Notification["category"], { bg: string; color: string }> = {
-  booking:  { bg: "#eff6ff",  color: "#2563eb" },
-  payment:  { bg: "#f0fdf4",  color: "#16a34a" },
-  refund:   { bg: "#fdf4ff",  color: "#9333ea" },
-  alert:    { bg: "#fffbeb",  color: "#d97706" },
-  offer:    { bg: "#fff7ed",  color: "#ea580c" },
-  account:  { bg: "#f8fafc",  color: "#475569" },
+  booking: { bg: "#eff6ff", color: "#2563eb" },
+  payment: { bg: "#f0fdf4", color: "#16a34a" },
+  refund: { bg: "#fdf4ff", color: "#9333ea" },
+  alert: { bg: "#fffbeb", color: "#d97706" },
+  offer: { bg: "#fff7ed", color: "#ea580c" },
+  account: { bg: "#f8fafc", color: "#475569" },
 };
 
 const TABS = ["All", "Booking", "Payment", "Refund", "Alerts", "Offers"] as const;
@@ -58,7 +58,7 @@ type Tab = typeof TABS[number];
 
 /* ── Page ──────────────────────────────────────────────────── */
 export default function NotificationsPage() {
-  const [notifs, setNotifs]   = useState<Notification[]>(ALL_NOTIFICATIONS);
+  const [notifs, setNotifs] = useState<Notification[]>(ALL_NOTIFICATIONS);
   const [activeTab, setActiveTab] = useState<Tab>("All");
 
   const unread = notifs.filter((n) => !n.read).length;
@@ -83,10 +83,10 @@ export default function NotificationsPage() {
     return order.filter((d) => map[d]).map((d) => ({ date: d, items: map[d] }));
   }, [filtered]);
 
-  const markAllRead  = () => setNotifs((p) => p.map((n) => ({ ...n, read: true })));
-  const markRead     = (id: number) => setNotifs((p) => p.map((n) => n.id === id ? { ...n, read: true } : n));
-  const dismiss      = (id: number) => setNotifs((p) => p.filter((n) => n.id !== id));
-  const clearAll     = () => setNotifs([]);
+  const markAllRead = () => setNotifs((p) => p.map((n) => ({ ...n, read: true })));
+  const markRead = (id: number) => setNotifs((p) => p.map((n) => n.id === id ? { ...n, read: true } : n));
+  const dismiss = (id: number) => setNotifs((p) => p.filter((n) => n.id !== id));
+  const clearAll = () => setNotifs([]);
 
   return (
     <div style={{ minHeight: "100vh", background: "#f0f2f5" }}>

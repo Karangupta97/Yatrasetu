@@ -37,7 +37,7 @@ function PaxStatus({ status }: { status: "CNF" | "RAC" | "WL" }) {
   const s = {
     CNF: { bg: "#f0fdf4", color: "#16a34a", border: "1px solid #bbf7d0" },
     RAC: { bg: "#fffbeb", color: "#d97706", border: "1px solid #fde68a" },
-    WL:  { bg: "#eff6ff", color: "#2563eb", border: "1px solid #bfdbfe" },
+    WL: { bg: "#eff6ff", color: "#2563eb", border: "1px solid #bfdbfe" },
   }[status];
   return (
     <span style={{ ...s, padding: "2px 10px", borderRadius: "9999px", fontSize: "11px", fontWeight: 700 }}>
@@ -95,13 +95,13 @@ export default function BookingDetailPage({ params }: { params: Promise<{ pnr: s
   const [booking, setBooking] = useState<Booking | undefined>(
     () => MOCK_BOOKINGS.find((b) => b.pnr === pnr)
   );
-  const [copied, setCopied]             = useState(false);
-  const [showCancel, setShowCancel]     = useState(false);
-  const [cancelDone, setCancelDone]     = useState(false);
-  const [showTicket, setShowTicket]     = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [showCancel, setShowCancel] = useState(false);
+  const [cancelDone, setCancelDone] = useState(false);
+  const [showTicket, setShowTicket] = useState(false);
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(pnr).catch(() => {});
+    navigator.clipboard.writeText(pnr).catch(() => { });
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -406,11 +406,11 @@ export default function BookingDetailPage({ params }: { params: Promise<{ pnr: s
             <SectionCard title="Fare Details">
               <div className="flex flex-col gap-3">
                 {[
-                  { label: "Base Fare",            val: booking.fare.baseFare },
-                  { label: "Reservation Charges",  val: booking.fare.reservationCharges },
-                  { label: "Superfast Charges",     val: booking.fare.superfastCharges },
-                  { label: "Other Charges",         val: booking.fare.otherCharges },
-                  { label: "IRCTC Service Fee",     val: booking.fare.irctcServiceFee },
+                  { label: "Base Fare", val: booking.fare.baseFare },
+                  { label: "Reservation Charges", val: booking.fare.reservationCharges },
+                  { label: "Superfast Charges", val: booking.fare.superfastCharges },
+                  { label: "Other Charges", val: booking.fare.otherCharges },
+                  { label: "IRCTC Service Fee", val: booking.fare.irctcServiceFee },
                 ].map(({ label, val }) => (
                   <div key={label} className="flex items-center justify-between">
                     <span style={{ fontSize: "13px", color: "#6b7280" }}>{label}</span>
@@ -449,10 +449,10 @@ export default function BookingDetailPage({ params }: { params: Promise<{ pnr: s
             <SectionCard title="Booking Info">
               <div className="flex flex-col gap-3">
                 {[
-                  { label: "Booking Date",    val: booking.bookingInfo.bookingDate },
-                  { label: "Booked From",     val: booking.bookingInfo.bookedFrom },
-                  { label: "Payment Method",  val: booking.bookingInfo.paymentMethod },
-                  { label: "Transaction ID",  val: booking.bookingInfo.transactionId },
+                  { label: "Booking Date", val: booking.bookingInfo.bookingDate },
+                  { label: "Booked From", val: booking.bookingInfo.bookedFrom },
+                  { label: "Payment Method", val: booking.bookingInfo.paymentMethod },
+                  { label: "Transaction ID", val: booking.bookingInfo.transactionId },
                 ].map(({ label, val }) => (
                   <div key={label}>
                     <p style={{ fontSize: "11px", color: "#9ca3af", marginBottom: "1px" }}>{label}</p>

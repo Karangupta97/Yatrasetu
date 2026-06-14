@@ -54,8 +54,8 @@ export default function TrainDetailPage({
   const train = TRAINS.find((t) => t.id === id);
 
   const [showAllStops, setShowAllStops] = useState(false);
-  const [refreshing, setRefreshing]     = useState(false);
-  const [lastUpdated, setLastUpdated]   = useState("Just now");
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState("Just now");
 
   if (!train) {
     return (
@@ -72,14 +72,14 @@ export default function TrainDetailPage({
     );
   }
 
-  const delay    = getDelay(train.id);
+  const delay = getDelay(train.id);
   const isOnTime = delay <= 0;
-  const isLate   = delay > 15;
+  const isLate = delay > 15;
 
   const fullRoute: RouteStop[] = [
     { city: train.departure.city, time: train.departure.time, date: train.departure.date, isOrigin: true },
     ...train.stops.map((s) => ({ city: s.city, time: s.time ?? "—", date: s.date })),
-    { city: train.arrival.city,   time: train.arrival.time,   date: train.arrival.date,   isDestination: true },
+    { city: train.arrival.city, time: train.arrival.time, date: train.arrival.date, isDestination: true },
   ];
 
   const now = new Date();
@@ -101,7 +101,7 @@ export default function TrainDetailPage({
   };
 
   const delayColor = isOnTime ? "#16a34a" : isLate ? "#dc2626" : "#d97706";
-  const delayBg    = isOnTime ? "#f0fdf4" : isLate ? "#fef2f2" : "#fffbeb";
+  const delayBg = isOnTime ? "#f0fdf4" : isLate ? "#fef2f2" : "#fffbeb";
   const [ratingNum] = train.rating.split(" · ");
 
   return (
@@ -209,7 +209,7 @@ export default function TrainDetailPage({
               <div style={{ background: delayBg, padding: "12px 20px", display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid #f3f4f6" }}>
                 {isOnTime
                   ? <CheckCircle2 size={18} style={{ color: "#16a34a" }} />
-                  : <AlertCircle  size={18} style={{ color: delayColor }} />
+                  : <AlertCircle size={18} style={{ color: delayColor }} />
                 }
                 <div>
                   <p style={{ fontSize: "14px", fontWeight: 700, color: delayColor }}>
@@ -247,11 +247,11 @@ export default function TrainDetailPage({
                   <div style={{ position: "absolute", left: "11px", top: "12px", width: "2px", height: `${Math.min(100, (currentStopIndex / Math.max(1, fullRoute.length - 1)) * 100)}%`, background: "linear-gradient(to bottom, #748efe, #a78bfa)", zIndex: 1, transition: "height 0.6s ease" }} aria-hidden="true" />
 
                   {visibleStops.map((stop, idx) => {
-                    const abs       = fullRoute.indexOf(stop);
-                    const isPassed  = abs < currentStopIndex;
+                    const abs = fullRoute.indexOf(stop);
+                    const isPassed = abs < currentStopIndex;
                     const isCurrent = abs === currentStopIndex;
-                    const isFirst   = abs === 0;
-                    const isLast    = abs === fullRoute.length - 1;
+                    const isFirst = abs === 0;
+                    const isLast = abs === fullRoute.length - 1;
 
                     return (
                       <div key={`${stop.city}-${idx}`} className="flex items-start gap-4" style={{ position: "relative", zIndex: 2, paddingBottom: idx < visibleStops.length - 1 ? "20px" : "0" }} role="listitem">
@@ -272,8 +272,8 @@ export default function TrainDetailPage({
                           <div className="flex items-center justify-between gap-2">
                             <p style={{ fontSize: isCurrent || isFirst || isLast ? "14px" : "13px", fontWeight: isCurrent || isFirst || isLast ? 700 : 500, color: isPassed || isCurrent ? "#181d2a" : "#9ca3af" }}>
                               {stop.city}
-                              {isFirst   && <span style={{ marginLeft: "8px", fontSize: "10px", background: "#eff6ff", color: "#2563eb", borderRadius: "9999px", padding: "2px 8px", fontWeight: 600 }}>ORIGIN</span>}
-                              {isLast    && <span style={{ marginLeft: "8px", fontSize: "10px", background: "#f0fdf4", color: "#16a34a", borderRadius: "9999px", padding: "2px 8px", fontWeight: 600 }}>DESTINATION</span>}
+                              {isFirst && <span style={{ marginLeft: "8px", fontSize: "10px", background: "#eff6ff", color: "#2563eb", borderRadius: "9999px", padding: "2px 8px", fontWeight: 600 }}>ORIGIN</span>}
+                              {isLast && <span style={{ marginLeft: "8px", fontSize: "10px", background: "#f0fdf4", color: "#16a34a", borderRadius: "9999px", padding: "2px 8px", fontWeight: 600 }}>DESTINATION</span>}
                               {isCurrent && <span style={{ marginLeft: "8px", fontSize: "10px", background: "rgba(116,142,254,0.1)", color: "#748efe", borderRadius: "9999px", padding: "2px 8px", fontWeight: 700 }}>CURRENT</span>}
                             </p>
                             <div style={{ textAlign: "right", flexShrink: 0 }}>
@@ -304,7 +304,7 @@ export default function TrainDetailPage({
               <p style={{ fontSize: "13px", fontWeight: 700, color: "#181d2a", marginBottom: "14px" }}>Seat Availability</p>
               <div className="flex flex-col gap-2">
                 {train.classes.map((cls) => {
-                  const isWL  = cls.status.toLowerCase().startsWith("wl");
+                  const isWL = cls.status.toLowerCase().startsWith("wl");
                   const isRAC = cls.status.toLowerCase().startsWith("rac");
                   return (
                     <div key={cls.code} className="flex items-center justify-between" style={{ padding: "10px 14px", borderRadius: "10px", border: "1px solid #e8ebed", background: "#fafafa" }}>
@@ -331,12 +331,12 @@ export default function TrainDetailPage({
             <div style={{ background: "#ffffff", borderRadius: "14px", border: "1px solid #e8ebed", boxShadow: "0 1px 4px rgba(0,0,0,0.06)", padding: "20px" }}>
               <p style={{ fontSize: "13px", fontWeight: 700, color: "#181d2a", marginBottom: "14px" }}>Journey Info</p>
               {[
-                { icon: <Train size={14} />,      label: "Train No.",     value: train.trainNumber },
-                { icon: <Calendar size={14} />,   label: "Runs on",       value: train.runsOn      },
-                { icon: <Clock size={14} />,      label: "Duration",      value: train.duration    },
-                { icon: <MapPin size={14} />,     label: "Distance",      value: train.distance    },
-                { icon: <Users size={14} />,      label: "Operator",      value: train.operator    },
-                { icon: <TrendingUp size={14} />, label: "Tatkal opens",  value: train.tatkalTime ?? "N/A" },
+                { icon: <Train size={14} />, label: "Train No.", value: train.trainNumber },
+                { icon: <Calendar size={14} />, label: "Runs on", value: train.runsOn },
+                { icon: <Clock size={14} />, label: "Duration", value: train.duration },
+                { icon: <MapPin size={14} />, label: "Distance", value: train.distance },
+                { icon: <Users size={14} />, label: "Operator", value: train.operator },
+                { icon: <TrendingUp size={14} />, label: "Tatkal opens", value: train.tatkalTime ?? "N/A" },
               ].map(({ icon, label, value }) => (
                 <div key={label} className="flex items-center justify-between" style={{ padding: "8px 0", borderBottom: "1px solid #f3f4f6" }}>
                   <div className="flex items-center gap-2" style={{ color: "#9ca3af", fontSize: "12px" }}>{icon}{label}</div>

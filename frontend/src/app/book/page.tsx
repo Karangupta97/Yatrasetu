@@ -3,12 +3,12 @@
 import { useState, useCallback } from "react";
 import BookingsNavbar from "../my-bookings/components/BookingsNavbar";
 import StepIndicator from "./components/StepIndicator";
-import Step1Journey    from "./steps/Step1Journey";
+import Step1Journey from "./steps/Step1Journey";
 import Step2Passengers from "./steps/Step2Passengers";
-import Step3Seats      from "./steps/Step3Seats";
-import Step4Review     from "./steps/Step4Review";
-import Step5Payment    from "./steps/Step5Payment";
-import Step6Confirm    from "./steps/Step6Confirm";
+import Step3Seats from "./steps/Step3Seats";
+import Step4Review from "./steps/Step4Review";
+import Step5Payment from "./steps/Step5Payment";
+import Step6Confirm from "./steps/Step6Confirm";
 import {
   BookingState, makeFare, generatePNR,
 } from "./types";
@@ -44,8 +44,8 @@ const INITIAL: BookingState = {
 };
 
 export default function BookPage() {
-  const [step, setStep]     = useState(1);
-  const [state, _setState]  = useState<BookingState>(INITIAL);
+  const [step, setStep] = useState(1);
+  const [state, _setState] = useState<BookingState>(INITIAL);
 
   const setState = useCallback((patch: Partial<BookingState>) => {
     _setState((prev) => {

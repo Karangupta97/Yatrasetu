@@ -67,21 +67,21 @@ export default function BookingsNavbar() {
   const initial = user?.fullName
     ? user.fullName.charAt(0).toUpperCase()
     : user?.username
-    ? user.username.charAt(0).toUpperCase()
-    : "U";
+      ? user.username.charAt(0).toUpperCase()
+      : "U";
 
   const navLinks = user
     ? [
-        { label: "Browse tickets", href: "/passenger" },
-        { label: "My Bookings",    href: "/my-bookings" },
-        { label: "Contact Us",     href: "/contact" },
-      ]
+      { label: "Browse tickets", href: "/passenger" },
+      { label: "My Bookings", href: "/my-bookings" },
+      { label: "Contact Us", href: "/contact" },
+    ]
     : [
-        { label: "Features",       href: "/#features" },
-        { label: "How It Works",   href: "/#how-it-works" },
-        { label: "Browse tickets", href: "/passenger" },
-        { label: "Contact Us",     href: "/contact" },
-      ];
+      { label: "Features", href: "/#features" },
+      { label: "How It Works", href: "/#how-it-works" },
+      { label: "Browse tickets", href: "/passenger" },
+      { label: "Contact Us", href: "/contact" },
+    ];
 
   return (
     <nav
@@ -169,11 +169,10 @@ export default function BookingsNavbar() {
                 key={label}
                 href={href}
                 role="menuitem"
-                className={`px-4 py-2 rounded-xl text-[14px] font-semibold transition-all duration-200 focus:outline-none text-decoration-none ${
-                  isActive
+                className={`px-4 py-2 rounded-xl text-[14px] font-semibold transition-all duration-200 focus:outline-none text-decoration-none ${isActive
                     ? "text-blue-600 bg-blue-50/70"
                     : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
-                }`}
+                  }`}
               >
                 {label}
               </Link>

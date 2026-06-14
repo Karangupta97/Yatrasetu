@@ -2,12 +2,12 @@
 import { CreditCard, XCircle, RotateCcw, AlertCircle, FileText, Clock } from "lucide-react";
 
 const CATS = [
-  { icon: <CreditCard size={22} style={{ color: "#748efe" }} />, label: "Payment Issue",    desc: "Failed payment, double deduction, card error",    bg: "#eff6ff", border: "#bfdbfe" },
-  { icon: <XCircle    size={22} style={{ color: "#f4632a" }} />, label: "Cancellation",     desc: "Cancel booking, partial cancel, TDR filing",      bg: "#fff7ed", border: "#fed7aa" },
-  { icon: <RotateCcw  size={22} style={{ color: "#22c55e" }} />, label: "Refund Status",    desc: "Track refund, not received, wrong amount",        bg: "#f0fdf4", border: "#bbf7d0" },
-  { icon: <AlertCircle size={22} style={{ color: "#f59e0b" }} />, label: "Booking Failure", desc: "Ticket not confirmed, error during booking",      bg: "#fffbeb", border: "#fde68a" },
-  { icon: <FileText   size={22} style={{ color: "#8b5cf6" }} />, label: "PNR / E-Ticket",  desc: "PNR not found, ticket not received on email",     bg: "#fdf4ff", border: "#e9d5ff" },
-  { icon: <Clock      size={22} style={{ color: "#0891b2" }} />, label: "Train Schedule",   desc: "Delay, platform change, live running status",    bg: "#ecfeff", border: "#a5f3fc" },
+  { icon: <CreditCard size={22} style={{ color: "#748efe" }} />, label: "Payment Issue", desc: "Failed payment, double deduction, card error", bg: "#eff6ff", border: "#bfdbfe" },
+  { icon: <XCircle size={22} style={{ color: "#f4632a" }} />, label: "Cancellation", desc: "Cancel booking, partial cancel, TDR filing", bg: "#fff7ed", border: "#fed7aa" },
+  { icon: <RotateCcw size={22} style={{ color: "#22c55e" }} />, label: "Refund Status", desc: "Track refund, not received, wrong amount", bg: "#f0fdf4", border: "#bbf7d0" },
+  { icon: <AlertCircle size={22} style={{ color: "#f59e0b" }} />, label: "Booking Failure", desc: "Ticket not confirmed, error during booking", bg: "#fffbeb", border: "#fde68a" },
+  { icon: <FileText size={22} style={{ color: "#8b5cf6" }} />, label: "PNR / E-Ticket", desc: "PNR not found, ticket not received on email", bg: "#fdf4ff", border: "#e9d5ff" },
+  { icon: <Clock size={22} style={{ color: "#0891b2" }} />, label: "Train Schedule", desc: "Delay, platform change, live running status", bg: "#ecfeff", border: "#a5f3fc" },
 ];
 
 export default function IssueCategories() {

@@ -9,21 +9,21 @@ import EmptyState from "./components/EmptyState";
 import { MOCK_BOOKINGS, BookingStatus } from "./data/mockBookings";
 
 // ── Booking flow imports ──────────────────────────────────────
-import StepIndicator    from "../book/components/StepIndicator";
-import Step1Journey     from "../book/steps/Step1Journey";
-import Step2Passengers  from "../book/steps/Step2Passengers";
-import Step3Seats       from "../book/steps/Step3Seats";
-import Step4Review      from "../book/steps/Step4Review";
-import Step5Payment     from "../book/steps/Step5Payment";
-import Step6Confirm     from "../book/steps/Step6Confirm";
+import StepIndicator from "../book/components/StepIndicator";
+import Step1Journey from "../book/steps/Step1Journey";
+import Step2Passengers from "../book/steps/Step2Passengers";
+import Step3Seats from "../book/steps/Step3Seats";
+import Step4Review from "../book/steps/Step4Review";
+import Step5Payment from "../book/steps/Step5Payment";
+import Step6Confirm from "../book/steps/Step6Confirm";
 import { BookingState, makeFare, generatePNR } from "../book/types";
 
 // ── Types ─────────────────────────────────────────────────────
 type View = "list" | "booking";
-type Tab  = "All" | "Upcoming" | "Completed" | "Cancelled";
+type Tab = "All" | "Upcoming" | "Completed" | "Cancelled";
 
 const TABS: Tab[] = ["All", "Upcoming", "Completed", "Cancelled"];
-const UPCOMING_STATUSES:  BookingStatus[] = ["Confirmed", "RAC", "Waitlisted"];
+const UPCOMING_STATUSES: BookingStatus[] = ["Confirmed", "RAC", "Waitlisted"];
 const COMPLETED_STATUSES: BookingStatus[] = ["Completed"];
 const CANCELLED_STATUSES: BookingStatus[] = ["Cancelled", "Refund Initiated"];
 
@@ -62,14 +62,14 @@ const INITIAL_BOOKING: BookingState = {
 export default function MyBookingsPage() {
   // List view state
   const [activeTab, setActiveTab] = useState<Tab>("All");
-  const [search, setSearch]       = useState("");
-  const [loading, setLoading]     = useState(true);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
 
   // View toggle
   const [view, setView] = useState<View>("list");
 
   // Booking flow state
-  const [step, setStep]         = useState(1);
+  const [step, setStep] = useState(1);
   const [bookState, _setBState] = useState<BookingState>(INITIAL_BOOKING);
 
   // Simulate list load
@@ -81,7 +81,7 @@ export default function MyBookingsPage() {
   // ── Filtered bookings ──
   const filtered = useMemo(() => {
     let items = MOCK_BOOKINGS;
-    if (activeTab === "Upcoming")  items = items.filter((b) => UPCOMING_STATUSES.includes(b.status));
+    if (activeTab === "Upcoming") items = items.filter((b) => UPCOMING_STATUSES.includes(b.status));
     if (activeTab === "Completed") items = items.filter((b) => COMPLETED_STATUSES.includes(b.status));
     if (activeTab === "Cancelled") items = items.filter((b) => CANCELLED_STATUSES.includes(b.status));
     if (search.trim()) {

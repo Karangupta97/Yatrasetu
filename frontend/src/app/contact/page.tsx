@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import BookingsNavbar   from "../my-bookings/components/BookingsNavbar";
-import SearchHero       from "./components/SearchHero";
-import SupportCards     from "./components/SupportCards";
-import IssueCategories  from "./components/IssueCategories";
-import FaqSection       from "./components/FaqSection";
-import ContactInfo      from "./components/ContactInfo";
-import SocialLinks      from "./components/SocialLinks";
-import ComplaintForm    from "./components/ComplaintForm";
+import BookingsNavbar from "../my-bookings/components/BookingsNavbar";
+import SearchHero from "./components/SearchHero";
+import SupportCards from "./components/SupportCards";
+import IssueCategories from "./components/IssueCategories";
+import FaqSection from "./components/FaqSection";
+import ContactInfo from "./components/ContactInfo";
+import SocialLinks from "./components/SocialLinks";
+import ComplaintForm from "./components/ComplaintForm";
 
 export default function ContactPage() {
   const [query, setQuery] = useState("");

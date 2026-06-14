@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { loadSessionUser } from "@/lib/auth-store";
-import BookingsNavbar      from "../my-bookings/components/BookingsNavbar";
-import ProfileInfo         from "./components/ProfileInfo";
+import BookingsNavbar from "../my-bookings/components/BookingsNavbar";
+import ProfileInfo from "./components/ProfileInfo";
 import AadhaarVerification from "./components/AadhaarVerification";
-import BillingPayment      from "./components/BillingPayment";
-import Link                from "next/link";
+import BillingPayment from "./components/BillingPayment";
+import Link from "next/link";
 import {
   ArrowLeft, User, ShieldCheck, CreditCard,
   Train, Bell, Menu, X,
@@ -44,8 +44,8 @@ const NAV_ITEMS: { id: Section; label: string; sub: string; Icon: React.ElementT
 
 /* ── Right sidebar quick links ────────────────────────────── */
 const QUICK_LINKS = [
-  { icon: <Train size={15} style={{ color: "#748efe" }} />, label: "My Bookings",   href: "/my-bookings", bg: "#eff6ff" },
-  { icon: <Bell  size={15} style={{ color: "#f59e0b" }} />, label: "Notifications", href: "/notifications", bg: "#fffbeb" },
+  { icon: <Train size={15} style={{ color: "#748efe" }} />, label: "My Bookings", href: "/my-bookings", bg: "#eff6ff" },
+  { icon: <Bell size={15} style={{ color: "#f59e0b" }} />, label: "Notifications", href: "/notifications", bg: "#fffbeb" },
 ];
 
 /* ── Section title map ────────────────────────────────────── */
@@ -57,7 +57,7 @@ const SECTION_TITLE: Record<Section, string> = {
 
 /* ═══════════════════════════════════════════════════════════ */
 export default function ProfilePage() {
-  const [active, setActive]         = useState<Section>("profile");
+  const [active, setActive] = useState<Section>("profile");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
 
@@ -68,8 +68,8 @@ export default function ProfilePage() {
   const initial = user?.fullName
     ? user.fullName.charAt(0).toUpperCase()
     : user?.username
-    ? user.username.charAt(0).toUpperCase()
-    : "U";
+      ? user.username.charAt(0).toUpperCase()
+      : "U";
 
   const displayName = user?.fullName || user?.username || "YatraSetu Member";
 
@@ -114,8 +114,8 @@ export default function ProfilePage() {
               {/* Stats rows */}
               <div style={{ padding: "14px 16px" }}>
                 {[
-                  { label: "Bookings",     value: "6" },
-                  { label: "Total saved",  value: "₹3,420" },
+                  { label: "Bookings", value: "6" },
+                  { label: "Total saved", value: "₹3,420" },
                   { label: "Member since", value: "Aug 2023" },
                 ].map(({ label, value }, i, arr) => (
                   <div key={label} className="flex justify-between items-center"
