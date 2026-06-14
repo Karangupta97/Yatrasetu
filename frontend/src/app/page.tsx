@@ -146,8 +146,8 @@ function Hero() {
 const FEATURES = [
   {
     icon: <ShieldCheck size={24} strokeWidth={1.75} />,
-    iconBg: "rgba(99,102,241,0.1)",
-    iconColor: "#6366f1",
+    iconBg: "rgba(37,99,235,0.1)",
+    iconColor: "#2563eb",
     title: "Aadhaar-Verified Accounts",
     desc: "Every account is KYC-verified with Aadhaar to ensure genuine identity and maximum security for all passengers.",
   },
@@ -160,8 +160,8 @@ const FEATURES = [
   },
   {
     icon: <Activity size={24} strokeWidth={1.75} />,
-    iconBg: "rgba(99,102,241,0.1)",
-    iconColor: "#6366f1",
+    iconBg: "rgba(37,99,235,0.1)",
+    iconColor: "#2563eb",
     title: "Real-Time PNR Tracking",
     desc: "Live updates on your train status, platform changes, and seat availability straight from the IRCTC database.",
   },
@@ -174,8 +174,8 @@ const FEATURES = [
   },
   {
     icon: <Smartphone size={24} strokeWidth={1.75} />,
-    iconBg: "rgba(99,102,241,0.1)",
-    iconColor: "#6366f1",
+    iconBg: "rgba(37,99,235,0.1)",
+    iconColor: "#2563eb",
     title: "Works Offline (PWA)",
     desc: "Install YatraSetu as a progressive web app. View your tickets and PNR status even without internet connectivity.",
   },
