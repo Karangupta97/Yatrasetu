@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { loadSessionUser, clearSessionUser } from "@/lib/auth-store";
 import { apiLogout, type AuthUser } from "@/lib/api";
+import { getAvatarGradient } from "@/hooks/useUserProfile";
 
 const UNREAD_COUNT = 2;
 
@@ -69,11 +70,19 @@ export default function BookingsNavbar() {
     window.location.href = "/";
   }
 
-  const initial = user?.fullName
-    ? user.fullName.charAt(0).toUpperCase()
-    : user?.username
-      ? user.username.charAt(0).toUpperCase()
-      : "U";
+  /** Two-letter initials: first letter of first name + first letter of last name */
+  const initials = (() => {
+    if (user?.fullName) {
+      const parts = user.fullName.trim().split(/\s+/);
+      if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+      return parts[0][0].toUpperCase();
+    }
+    if (user?.username) return user.username[0].toUpperCase();
+    return "U";
+  })();
+
+  const avatarGradient = getAvatarGradient(user?.username ?? null);
+  const tooltipName = user?.fullName || user?.username || "My Profile";
 
   return (
     <>
@@ -236,25 +245,33 @@ export default function BookingsNavbar() {
                   )}
                 </Link>
 
-                {/* Avatar */}
-                <Link
-                  href="/profile"
-                  aria-label="My profile"
-                  style={{
-                    width: "36px", height: "36px",
-                    background: "linear-gradient(135deg, #6366F1 0%, #4338CA 100%)",
-                    borderRadius: "10px",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    color: "#fff", fontSize: "13px", fontWeight: 700,
-                    textDecoration: "none",
-                    boxShadow: "0 2px 8px rgba(99,102,241,0.25)",
-                    transition: "transform 0.18s, box-shadow 0.18s",
-                    flexShrink: 0,
-                  }}
-                  className="avatar-btn"
-                >
-                  {initial}
-                </Link>
+                {/* Avatar with tooltip */}
+                <div style={{ position: "relative" }} className="avatar-wrapper">
+                  <Link
+                    href="/profile"
+                    aria-label={`My profile — ${tooltipName}`}
+                    title={tooltipName}
+                    style={{
+                      width: "36px", height: "36px",
+                      background: avatarGradient,
+                      borderRadius: "10px",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      color: "#fff", fontSize: "12px", fontWeight: 700,
+                      textDecoration: "none",
+                      boxShadow: "0 2px 8px rgba(99,102,241,0.25)",
+                      transition: "transform 0.18s, box-shadow 0.18s",
+                      flexShrink: 0,
+                      letterSpacing: "0.02em",
+                    }}
+                    className="avatar-btn"
+                  >
+                    {initials}
+                  </Link>
+                  {/* Hover tooltip */}
+                  <div className="avatar-tooltip" aria-hidden="true">
+                    {tooltipName}
+                  </div>
+                </div>
 
                 {/* Logout */}
                 <button
@@ -399,7 +416,7 @@ export default function BookingsNavbar() {
                   onClick={() => setMobileOpen(false)}
                   style={{ display: "flex", alignItems: "center", gap: "10px", padding: "12px 16px", borderRadius: "10px", background: "#F9FAFB", color: "#374151", textDecoration: "none", fontWeight: 500, fontSize: "14px" }}
                 >
-                  <div style={{ width: "26px", height: "26px", background: "linear-gradient(135deg, #6366F1 0%, #4338CA 100%)", borderRadius: "7px", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "11px", fontWeight: 700 }}>{initial}</div>
+                  <div style={{ width: "26px", height: "26px", background: avatarGradient, borderRadius: "7px", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "11px", fontWeight: 700 }}>{initials}</div>
                   My Profile
                 </Link>
                 <button
@@ -461,6 +478,38 @@ export default function BookingsNavbar() {
         .avatar-btn:hover {
           transform: scale(1.07);
           box-shadow: 0 4px 14px rgba(99,102,241,0.35) !important;
+        }
+
+        /* Avatar tooltip */
+        .avatar-wrapper { position: relative; }
+        .avatar-tooltip {
+          position: absolute;
+          top: calc(100% + 8px);
+          left: 50%;
+          transform: translateX(-50%);
+          background: #111827;
+          color: #fff;
+          font-size: 12px;
+          font-weight: 500;
+          white-space: nowrap;
+          padding: 5px 10px;
+          border-radius: 6px;
+          pointer-events: none;
+          opacity: 0;
+          transition: opacity 0.15s ease;
+          z-index: 100;
+        }
+        .avatar-tooltip::before {
+          content: "";
+          position: absolute;
+          bottom: 100%;
+          left: 50%;
+          transform: translateX(-50%);
+          border: 5px solid transparent;
+          border-bottom-color: #111827;
+        }
+        .avatar-wrapper:hover .avatar-tooltip {
+          opacity: 1;
         }
 
         /* Logout hover */

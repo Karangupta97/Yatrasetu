@@ -1,178 +1,381 @@
 "use client";
 
-import { useState } from "react";
-import { Camera, Pencil, Check, X, User } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Pencil, Check, X, Plus } from "lucide-react";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 const GENDER_OPTIONS = ["Male", "Female", "Other", "Prefer not to say"];
 
+interface DraftFields {
+  fullName: string;
+  age: string;
+  gender: string;
+  phone: string;
+  email: string;
+}
+
+interface FieldErrors {
+  fullName?: string;
+  age?: string;
+  phone?: string;
+  email?: string;
+}
+
+/* ── Field display with "Not provided" fallback ──────────────── */
+function FieldValue({
+  value,
+  onAddClick,
+}: {
+  value: string | null | undefined;
+  onAddClick?: () => void;
+}) {
+  if (value) {
+    return (
+      <p style={{ fontSize: "15px", color: "#181d2a", margin: 0, lineHeight: "1.5" }}>
+        {value}
+      </p>
+    );
+  }
+  return (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+      <span style={{ fontSize: "15px", color: "#9ca3af", fontStyle: "italic" }}>Not provided</span>
+      {onAddClick && (
+        <button
+          onClick={onAddClick}
+          style={{
+            display: "inline-flex", alignItems: "center", gap: "2px",
+            fontSize: "12px", color: "#6366F1", fontWeight: 600,
+            background: "none", border: "none", cursor: "pointer", padding: "0 4px",
+          }}
+        >
+          <Plus size={11} /> Add
+        </button>
+      )}
+    </span>
+  );
+}
+
+/* ── Inline input with error ─────────────────────────────────── */
+function FieldInput({
+  value, onChange, type = "text", placeholder, error,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  type?: string;
+  placeholder?: string;
+  error?: string;
+}) {
+  return (
+    <div>
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        style={{
+          width: "100%", padding: "10px 14px", fontSize: "14px",
+          color: "#181d2a",
+          border: `1.5px solid ${error ? "#dc2626" : "#e8ebed"}`,
+          borderRadius: "10px", background: "#fff", outline: "none",
+          transition: "border-color 0.15s",
+          fontFamily: "inherit",
+        }}
+        className="profile-input"
+      />
+      {error && (
+        <p style={{ fontSize: "12px", color: "#dc2626", marginTop: "3px" }}>{error}</p>
+      )}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════ */
 export default function ProfileInfo() {
+  const profile = useUserProfile();
   const [editing, setEditing] = useState(false);
-  const [saved, setSaved]     = useState(false);
-
-  const [form, setForm] = useState({
-    name:   "Jidnyasa Patel",
-    age:    "24",
-    gender: "Female",
-    phone:  "+91 98765 43210",
-    email:  "jidnyasa@email.com",
+  const [saved, setSaved] = useState(false);
+  const [draft, setDraft] = useState<DraftFields>({
+    fullName: "", age: "", gender: "", phone: "", email: "",
   });
-  const [draft, setDraft] = useState({ ...form });
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<FieldErrors>({});
 
-  const validate = () => {
-    const e: Record<string, string> = {};
-    if (!draft.name.trim())    e.name  = "Name is required";
-    if (!draft.age || isNaN(Number(draft.age)) || +draft.age < 1 || +draft.age > 120)
-      e.age = "Enter a valid age";
-    if (!draft.phone.replace(/\D/g, "").match(/^\d{10}$/))
-      e.phone = "Enter a valid 10-digit number";
-    if (!draft.email.includes("@")) e.email = "Enter a valid email";
+  // Sync draft from profile when entering edit mode
+  function startEdit() {
+    setDraft({
+      fullName: profile.fullName  ?? "",
+      age:      profile.age       ?? "",
+      gender:   profile.gender    ?? "",
+      phone:    profile.phone     ?? "",
+      email:    profile.email     ?? "",
+    });
+    setErrors({});
+    setEditing(true);
+  }
+
+  function validate(): boolean {
+    const e: FieldErrors = {};
+    if (!draft.fullName.trim()) e.fullName = "Name is required";
+    if (draft.age && (isNaN(Number(draft.age)) || +draft.age < 1 || +draft.age > 120)) {
+      e.age = "Enter a valid age (1–120)";
+    }
+    if (draft.phone && !draft.phone.replace(/\D/g, "").match(/^\d{10}$/)) {
+      e.phone = "Enter a valid 10-digit mobile number";
+    }
+    if (!draft.email.includes("@")) e.email = "Enter a valid email address";
     setErrors(e);
     return Object.keys(e).length === 0;
-  };
+  }
 
-  const handleSave = () => {
+  function handleSave() {
     if (!validate()) return;
-    setForm({ ...draft });
+    profile.updateProfile({
+      fullName: draft.fullName || undefined,
+      email:    draft.email    || undefined,
+      phone:    draft.phone    || undefined,
+      age:      draft.age      || undefined,
+      gender:   draft.gender   || undefined,
+    });
     setSaved(true);
     setEditing(false);
     setTimeout(() => setSaved(false), 2500);
-  };
+  }
 
-  const handleCancel = () => {
-    setDraft({ ...form });
+  function handleCancel() {
     setErrors({});
     setEditing(false);
+  }
+
+  const fieldLabel: React.CSSProperties = {
+    fontSize: "11px", fontWeight: 600, color: "#9ca3af",
+    letterSpacing: "0.07em", textTransform: "uppercase",
+    display: "block", marginBottom: "5px",
   };
 
-  const inp = (err?: string): React.CSSProperties => ({
-    width: "100%", padding: "10px 14px", fontSize: "14px", color: "#181d2a",
-    border: `1.5px solid ${err ? "#dc2626" : "#e8ebed"}`, borderRadius: "10px",
-    background: "#fff", outline: "none",
-  });
+  const fieldWrapper: React.CSSProperties = {
+    borderBottom: "1px solid #F3F4F6",
+    paddingBottom: "16px",
+    marginBottom: "4px",
+  };
 
   return (
-    <div style={{ background: "#fff", borderRadius: "14px", border: "1px solid #e8ebed", boxShadow: "0 1px 4px rgba(0,0,0,0.06)", overflow: "hidden" }}>
-      {/* Header */}
-      <div style={{ padding: "20px 22px", borderBottom: "1px solid #f3f4f6", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+    <div
+      style={{
+        background: "#fff", borderRadius: "16px",
+        border: "1px solid #e8ebed",
+        boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
+        overflow: "hidden",
+      }}
+    >
+      {/* ── Header ─────────────────────────────────── */}
+      <div
+        style={{
+          padding: "24px 28px 20px",
+          borderBottom: "1px solid #F3F4F6",
+          display: "flex", alignItems: "flex-start", justifyContent: "space-between",
+        }}
+      >
         <div>
-          <h2 style={{ fontSize: "16px", fontWeight: 700, color: "#181d2a", margin: 0 }}>Profile Information</h2>
-          <p style={{ fontSize: "13px", color: "#9ca3af", margin: "2px 0 0" }}>Manage your personal details</p>
+          <h2 style={{ fontSize: "18px", fontWeight: 700, color: "#181d2a", margin: "0 0 4px" }}>
+            Profile Information
+          </h2>
+          <p style={{ fontSize: "13px", color: "#9ca3af", margin: 0 }}>
+            Manage your personal details
+          </p>
         </div>
         {!editing && (
-          <button onClick={() => { setDraft({ ...form }); setEditing(true); }}
-            className="flex items-center gap-1.5 hover:opacity-80 transition-opacity focus:outline-none"
-            style={{ background: "rgba(116,142,254,0.08)", color: "#748efe", border: "1px solid rgba(116,142,254,0.2)", borderRadius: "9px", padding: "7px 14px", fontSize: "13px", fontWeight: 600, cursor: "pointer" }}>
+          <button
+            onClick={startEdit}
+            className="edit-btn"
+            style={{
+              display: "flex", alignItems: "center", gap: "6px",
+              fontSize: "13px", fontWeight: 600, color: "#6366F1",
+              background: "rgba(99,102,241,0.06)",
+              border: "1px solid rgba(99,102,241,0.18)",
+              borderRadius: "9px", padding: "8px 16px",
+              cursor: "pointer", fontFamily: "inherit",
+              transition: "background 0.15s",
+            }}
+          >
             <Pencil size={13} /> Edit
           </button>
         )}
       </div>
 
-      <div style={{ padding: "22px" }}>
-        {/* Avatar row */}
-        <div className="flex items-center gap-5 mb-6">
-          <div style={{ position: "relative", flexShrink: 0 }}>
-            <div style={{ width: "80px", height: "80px", borderRadius: "50%", background: "linear-gradient(135deg,#748efe,#2d3560)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <User size={36} style={{ color: "white" }} />
-            </div>
-            {editing && (
-              <button aria-label="Change photo"
-                style={{ position: "absolute", bottom: 0, right: 0, width: "26px", height: "26px", borderRadius: "50%", background: "#181d2a", border: "2px solid #fff", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-                <Camera size={12} style={{ color: "white" }} />
-              </button>
-            )}
+      <div style={{ padding: "28px" }}>
+        {/* ── User display row ────────────────────── */}
+        <div style={{ display: "flex", alignItems: "center", gap: "20px", marginBottom: "28px" }}>
+          {/* Avatar */}
+          <div
+            style={{
+              width: "72px", height: "72px", borderRadius: "50%", flexShrink: 0,
+              background: profile.avatarColor,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              boxShadow: "0 4px 16px rgba(99,102,241,0.25)",
+            }}
+          >
+            <span style={{ fontSize: "28px", fontWeight: 700, color: "white" }}>
+              {profile.initials}
+            </span>
           </div>
           <div>
-            <p style={{ fontSize: "18px", fontWeight: 700, color: "#181d2a" }}>{form.name}</p>
-            <p style={{ fontSize: "13px", color: "#9ca3af", marginTop: "2px" }}>{form.email}</p>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", marginTop: "6px", background: "#f0fdf4", color: "#16a34a", border: "1px solid #bbf7d0", borderRadius: "9999px", padding: "2px 10px", fontSize: "11px", fontWeight: 600 }}>
-              <Check size={11} /> Verified account
-            </span>
+            <p style={{ fontSize: "20px", fontWeight: 700, color: "#181d2a", margin: "0 0 3px" }}>
+              {profile.displayName}
+            </p>
+            <p style={{ fontSize: "14px", color: "#9ca3af", margin: "0 0 8px" }}>
+              {profile.email ?? "No email set"}
+            </p>
+            {profile.isEmailVerified && (
+              <span
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: "4px",
+                  background: "#f0fdf4", color: "#16a34a",
+                  border: "1px solid #bbf7d0", borderRadius: "9999px",
+                  padding: "2px 10px", fontSize: "11px", fontWeight: 600,
+                }}
+              >
+                <Check size={10} /> Verified account
+              </span>
+            )}
           </div>
         </div>
 
-        {/* Fields grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Full name */}
-          <div>
-            <label style={{ fontSize: "12px", fontWeight: 600, color: "#6b7280", display: "block", marginBottom: "5px", letterSpacing: "0.04em" }}>FULL NAME</label>
+        {/* ── Fields grid ─────────────────────────── */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 24px" }}>
+
+          {/* Full Name */}
+          <div style={fieldWrapper}>
+            <label style={fieldLabel}>Full Name</label>
             {editing
-              ? <>
-                  <input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} style={inp(errors.name)} />
-                  {errors.name && <p style={{ fontSize: "12px", color: "#dc2626", marginTop: "3px" }}>{errors.name}</p>}
-                </>
-              : <p style={{ fontSize: "14px", fontWeight: 500, color: "#181d2a" }}>{form.name}</p>}
+              ? <FieldInput value={draft.fullName} onChange={(v) => setDraft({ ...draft, fullName: v })} placeholder="Your full name" error={errors.fullName} />
+              : <FieldValue value={profile.fullName} onAddClick={startEdit} />}
           </div>
 
           {/* Age */}
-          <div>
-            <label style={{ fontSize: "12px", fontWeight: 600, color: "#6b7280", display: "block", marginBottom: "5px", letterSpacing: "0.04em" }}>AGE</label>
+          <div style={fieldWrapper}>
+            <label style={fieldLabel}>Age</label>
             {editing
-              ? <>
-                  <input type="number" value={draft.age} onChange={(e) => setDraft({ ...draft, age: e.target.value })} style={inp(errors.age)} placeholder="e.g. 24" />
-                  {errors.age && <p style={{ fontSize: "12px", color: "#dc2626", marginTop: "3px" }}>{errors.age}</p>}
-                </>
-              : <p style={{ fontSize: "14px", fontWeight: 500, color: "#181d2a" }}>{form.age} years</p>}
+              ? <FieldInput type="number" value={draft.age} onChange={(v) => setDraft({ ...draft, age: v })} placeholder="e.g. 24" error={errors.age} />
+              : <FieldValue value={profile.age ? `${profile.age} years` : null} onAddClick={startEdit} />}
           </div>
 
           {/* Gender */}
-          <div>
-            <label style={{ fontSize: "12px", fontWeight: 600, color: "#6b7280", display: "block", marginBottom: "5px", letterSpacing: "0.04em" }}>GENDER</label>
+          <div style={fieldWrapper}>
+            <label style={fieldLabel}>Gender</label>
             {editing
-              ? <select value={draft.gender} onChange={(e) => setDraft({ ...draft, gender: e.target.value })}
-                  style={{ ...inp(), color: "#181d2a" }}>
-                  {GENDER_OPTIONS.map((g) => <option key={g}>{g}</option>)}
+              ? (
+                <select
+                  value={draft.gender}
+                  onChange={(e) => setDraft({ ...draft, gender: e.target.value })}
+                  style={{
+                    width: "100%", padding: "10px 14px", fontSize: "14px",
+                    color: draft.gender ? "#181d2a" : "#9ca3af",
+                    border: "1.5px solid #e8ebed",
+                    borderRadius: "10px", background: "#fff", outline: "none",
+                    fontFamily: "inherit",
+                  }}
+                >
+                  <option value="">Select gender</option>
+                  {GENDER_OPTIONS.map((g) => <option key={g} value={g}>{g}</option>)}
                 </select>
-              : <p style={{ fontSize: "14px", fontWeight: 500, color: "#181d2a" }}>{form.gender}</p>}
+              )
+              : <FieldValue value={profile.gender} onAddClick={startEdit} />}
           </div>
 
           {/* Phone */}
-          <div>
-            <label style={{ fontSize: "12px", fontWeight: 600, color: "#6b7280", display: "block", marginBottom: "5px", letterSpacing: "0.04em" }}>PHONE NUMBER</label>
+          <div style={fieldWrapper}>
+            <label style={fieldLabel}>Phone Number</label>
             {editing
-              ? <>
-                  <input type="tel" value={draft.phone} onChange={(e) => setDraft({ ...draft, phone: e.target.value })} style={inp(errors.phone)} placeholder="+91 XXXXX XXXXX" />
-                  {errors.phone && <p style={{ fontSize: "12px", color: "#dc2626", marginTop: "3px" }}>{errors.phone}</p>}
-                </>
-              : <p style={{ fontSize: "14px", fontWeight: 500, color: "#181d2a" }}>{form.phone}</p>}
+              ? <FieldInput type="tel" value={draft.phone} onChange={(v) => setDraft({ ...draft, phone: v })} placeholder="+91 XXXXX XXXXX" error={errors.phone} />
+              : <FieldValue value={profile.phone} onAddClick={startEdit} />}
           </div>
 
           {/* Email — full width */}
-          <div className="sm:col-span-2">
-            <label style={{ fontSize: "12px", fontWeight: 600, color: "#6b7280", display: "block", marginBottom: "5px", letterSpacing: "0.04em" }}>EMAIL ADDRESS</label>
+          <div style={{ ...fieldWrapper, gridColumn: "1 / -1" }}>
+            <label style={fieldLabel}>Email Address</label>
             {editing
-              ? <>
-                  <input type="email" value={draft.email} onChange={(e) => setDraft({ ...draft, email: e.target.value })} style={inp(errors.email)} placeholder="you@email.com" />
-                  {errors.email && <p style={{ fontSize: "12px", color: "#dc2626", marginTop: "3px" }}>{errors.email}</p>}
-                </>
-              : <p style={{ fontSize: "14px", fontWeight: 500, color: "#181d2a" }}>{form.email}</p>}
+              ? <FieldInput type="email" value={draft.email} onChange={(v) => setDraft({ ...draft, email: v })} placeholder="you@email.com" error={errors.email} />
+              : <FieldValue value={profile.email} onAddClick={startEdit} />}
           </div>
         </div>
 
-        {/* Action row */}
+        {/* ── Edit actions ─────────────────────────── */}
         {editing && (
-          <div className="flex items-center gap-3 mt-5 pt-4" style={{ borderTop: "1px solid #f3f4f6" }}>
-            <button onClick={handleSave}
-              className="flex items-center gap-2 hover:opacity-90 active:scale-[0.97] transition-all focus:outline-none"
-              style={{ background: "#748efe", color: "#fff", borderRadius: "10px", padding: "10px 22px", fontSize: "14px", fontWeight: 700, border: "none", cursor: "pointer" }}>
+          <div
+            style={{
+              display: "flex", alignItems: "center", gap: "12px",
+              marginTop: "20px", paddingTop: "20px",
+              borderTop: "1px solid #F3F4F6",
+            }}
+            className="edit-actions"
+          >
+            <button
+              onClick={handleSave}
+              style={{
+                display: "flex", alignItems: "center", gap: "8px",
+                background: "#6366F1", color: "#fff", borderRadius: "10px",
+                padding: "10px 22px", fontSize: "14px", fontWeight: 700,
+                border: "none", cursor: "pointer", fontFamily: "inherit",
+                transition: "opacity 0.15s, transform 0.15s",
+              }}
+              className="save-btn"
+            >
               <Check size={15} /> Save Changes
             </button>
-            <button onClick={handleCancel}
-              className="flex items-center gap-2 hover:opacity-80 transition-opacity focus:outline-none"
-              style={{ background: "#f8fafc", color: "#6b7280", border: "1px solid #e8ebed", borderRadius: "10px", padding: "10px 18px", fontSize: "14px", fontWeight: 600, cursor: "pointer" }}>
+            <button
+              onClick={handleCancel}
+              style={{
+                display: "flex", alignItems: "center", gap: "6px",
+                background: "#f8fafc", color: "#6b7280",
+                border: "1px solid #e8ebed", borderRadius: "10px",
+                padding: "10px 18px", fontSize: "14px", fontWeight: 600,
+                cursor: "pointer", fontFamily: "inherit",
+                transition: "background 0.15s",
+              }}
+            >
               <X size={14} /> Cancel
             </button>
           </div>
         )}
 
-        {/* Save success toast */}
+        {/* ── Save success toast ───────────────────── */}
         {saved && (
-          <div className="flex items-center gap-2 mt-4" style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "10px", padding: "10px 14px" }}>
+          <div
+            style={{
+              display: "flex", alignItems: "center", gap: "8px",
+              marginTop: "16px", background: "#f0fdf4",
+              border: "1px solid #bbf7d0", borderRadius: "10px",
+              padding: "11px 16px",
+            }}
+            className="save-toast"
+          >
             <Check size={15} style={{ color: "#16a34a" }} />
-            <span style={{ fontSize: "13px", color: "#16a34a", fontWeight: 600 }}>Profile updated successfully!</span>
+            <span style={{ fontSize: "13px", color: "#16a34a", fontWeight: 600 }}>
+              Profile updated successfully!
+            </span>
           </div>
         )}
       </div>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        .profile-input:focus {
+          border-color: #6366F1 !important;
+          box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+        }
+        .edit-btn:hover { background: rgba(99,102,241,0.12) !important; }
+        .save-btn:hover  { opacity: 0.88; }
+        .save-btn:active { transform: scale(0.97); }
+        .save-toast { animation: toast-in 0.2s ease; }
+        @keyframes toast-in {
+          from { opacity: 0; transform: translateY(4px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .save-toast { animation: none; }
+        }
+        @media (max-width: 600px) {
+          .profile-info-grid { grid-template-columns: 1fr !important; }
+        }
+      `}} />
     </div>
   );
 }
