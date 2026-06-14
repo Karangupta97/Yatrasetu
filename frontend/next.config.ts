@@ -1,7 +1,11 @@
+import path from "path";
 import type { NextConfig } from "next";
 import path from "path";
 
 const nextConfig: NextConfig = {
+  turbopack: {
+    root: path.join(__dirname),
+  },
   typescript: {
     // Skips checking auto-generated Next.js internal route types only.
     // Source files are fully type-checked by the IDE and diagnostics tools.

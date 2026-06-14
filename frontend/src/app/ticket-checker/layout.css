@@ -1,0 +1,13 @@
+/* Shared ticket-checker layout — used by express & future local dashboards */
+
+.tc-root {
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+@media (min-width: 1024px) {
+  .tc-root {
+    height: 100dvh;
+    overflow: hidden;
+  }
+}
