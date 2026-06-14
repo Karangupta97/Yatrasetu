@@ -5,8 +5,14 @@ import Link from "next/link";
 import { Ticket, ArrowRight } from "lucide-react";
 import { loadSessionUser } from "@/lib/auth-store";
 
+/**
+ * HomeHeroCta — CTA buttons in the Hero section.
+ * Primary: indigo gradient with shimmer-sweep on hover (via CSS ::after).
+ * Outline: glass morphism — backdrop-blur, translucent border, white text.
+ * Checks auth state to swap "Book Now" vs "Register" copy.
+ */
 export default function HomeHeroCta() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<unknown>(null);
 
   useEffect(() => {
     setUser(loadSessionUser());
@@ -40,7 +46,7 @@ export default function HomeHeroCta() {
       <Link
         href="/register"
         className="home-hero__btn home-hero__btn--primary"
-        aria-label="Create your free account"
+        aria-label="Create your free account and book your first ticket"
       >
         <Ticket size={18} aria-hidden="true" />
         Book Your First Ticket
