@@ -1,0 +1,18 @@
+ts-jest[config] (WARN) 
+    The "ts-jest" config option "isolatedModules" is deprecated and will be removed in v30.0.0. Please use "isolatedModules: true" in /run/media/karan/New Volume/Projects/Yatrasetu/backend/tsconfig.json instead, see https://www.typescriptlang.org/tsconfig/#isolatedModules
+  
+PASS src/utils/__tests__/ticketValidity.local.test.ts
+  Property 4: non-ACTIVE status always invalid
+    ✓ returns isValid: false for every non-ACTIVE status (5 ms)
+  Property 5: Local ONE_WAY expiry window
+    ✓ isValid matches (now < purchasedAt + 1 hour) for any (purchasedAt, now) pair (1 ms)
+  Property 6: RETURN ticket expiry day-of-week rule
+    ✓ expiresAt follows the day-of-week rule for all 7 IST weekdays (1 ms)
+    ✓ isValid is false when now > expiresAt for RETURN ticket
+
+Test Suites: 1 passed, 1 total
+Tests:       4 passed, 4 total
+Snapshots:   0 total
+Time:        1.613 s
+Ran all test suites matching ticketValidity.local.
+Force exiting Jest: Have you considered using `--detectOpenHandles` to detect async operations that kept running after all tests finished?

@@ -1,0 +1,16 @@
+ts-jest[config] (WARN) 
+    The "ts-jest" config option "isolatedModules" is deprecated and will be removed in v30.0.0. Please use "isolatedModules: true" in /run/media/karan/New Volume/Projects/Yatrasetu/backend/tsconfig.json instead, see https://www.typescriptlang.org/tsconfig/#isolatedModules
+  
+PASS src/utils/__tests__/ticketValidity.express.test.ts
+PASS src/utils/__tests__/ticketValidity.local.test.ts
+PASS src/utils/__tests__/ticketId.pnr.test.ts
+PASS src/utils/__tests__/ticketId.uts.test.ts
+PASS src/utils/__tests__/smoke.test.ts
+
+Test Suites: 5 passed, 5 total
+Tests:       13 passed, 13 total
+Snapshots:   0 total
+Time:        1.72 s
+Ran all test suites matching ticketId|ticketValidity|smoke.
+Force exiting Jest: Have you considered using `--detectOpenHandles` to detect async operations that kept running after all tests finished?
+EXIT:0
