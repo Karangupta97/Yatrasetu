@@ -224,10 +224,10 @@ export default function BookingOverlay({ train, selectedClass, onClose }: Props)
       {/* ── Scrollable body ─────────────────────────────── */}
       <div
         id="booking-overlay-scroll"
-        className="flex-1 overflow-y-auto"
-        style={{ padding: "20px 16px 48px" }}
+        className="flex-1 overflow-y-auto px-4 md:px-6 lg:px-8"
+        style={{ paddingTop: "20px", paddingBottom: "48px" }}
       >
-        <div className="mx-auto" style={{ maxWidth: "780px" }}>
+        <div className="mx-auto" style={{ maxWidth: "640px" }}>
 
           {/* Step progress bar (steps 1–5; hidden on confirmation) */}
           {step < 6 && (
