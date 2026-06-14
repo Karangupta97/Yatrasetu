@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import PWAInstallPrompt from "@/components/shared/PWAInstallPrompt";
+import ServiceWorkerRegister from "@/components/shared/ServiceWorkerRegister";
 
 export const metadata: Metadata = {
   title: "YatraSetu — Your bridge to every journey.",
@@ -47,20 +48,11 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png" />
         <meta name="msapplication-TileImage" content="/icons/icon-144x144.png" />
         <meta name="msapplication-TileColor" content="#748efe" />
-        {/* Service Worker */}
-        <script dangerouslySetInnerHTML={{ __html: `
-          if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-              navigator.serviceWorker.register('/sw.js', { scope: '/' })
-                .then(function(r) { console.log('[YatraSetu SW] registered, scope:', r.scope); })
-                .catch(function(e) { console.warn('[YatraSetu SW] registration failed:', e); });
-            });
-          }
-        ` }} />
       </head>
       <body className="antialiased" style={{ fontFamily: "'Google Sans', 'Segoe UI', system-ui, sans-serif" }}>
         {children}
         <PWAInstallPrompt />
+        <ServiceWorkerRegister />
       </body>
     </html>
   );
