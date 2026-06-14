@@ -2,14 +2,11 @@
 
 import { useRef, useCallback, useState } from "react";
 import {
-  ChevronUp,
-  ChevronDown,
-  CalendarDays,
-  ArrowRight,
-  Check,
+  ChevronUp, ChevronDown, Check, RotateCcw, SlidersHorizontal,
+  Sunrise, Sun, Sunset, Moon, Utensils, Wifi, Leaf, Accessibility,
 } from "lucide-react";
-import TimePicker from "./TimePicker";
 
+/* ── Types ─────────────────────────────────────────────────── */
 type TimeVal = { hour: number; minute: number; period: "AM" | "PM" };
 
 export type Filters = {
@@ -18,444 +15,239 @@ export type Filters = {
   priceMax: number;
   fromTime: TimeVal;
   toTime: TimeVal;
+  trainTypes: string[];
+  amenities: string[];
 };
 
-type FilterSidebarProps = {
-  filters: Filters;
-  onChange: (f: Filters) => void;
-  onApply: () => void;
-};
+type Props = { filters: Filters; onChange: (f: Filters) => void; onApply: () => void };
 
-const PRICE_BAR_HEIGHTS = [20, 35, 55, 70, 85, 95, 100, 88, 72, 58, 45, 38, 28, 18];
-const PRICE_MIN_ABSOLUTE = 1000;
-const PRICE_MAX_ABSOLUTE = 5000;
-const PRICE_RANGE = PRICE_MAX_ABSOLUTE - PRICE_MIN_ABSOLUTE;
-const MIN_GAP = 200;
+/* ── Constants ─────────────────────────────────────────────── */
+const PRICE_MIN_ABS = 1000, PRICE_MAX_ABS = 5000, PRICE_RANGE = 4000, MIN_GAP = 200;
+const PRICE_BARS    = [20,35,55,70,85,95,100,88,72,58,45,38,28,18];
 
 const SEAT_CLASSES = [
-  { key: "Sleeper", label: "Sleeper" },
-  { key: "3A",      label: "AC 3 Tier (3A)" },
-  { key: "2A",      label: "AC 2 Tier (2A)" },
-  { key: "1A",      label: "AC First Class (1A)" },
+  { key:"Sleeper", code:"SL", count:6  },
+  { key:"3A",      code:"3A", count:8  },
+  { key:"2A",      code:"2A", count:5  },
+  { key:"1A",      code:"1A", count:3  },
+  { key:"CC",      code:"CC", count:4  },
 ];
 
-function formatTime(t: TimeVal) {
-  return `${String(t.hour).padStart(2, "0")}:${String(t.minute).padStart(2, "0")} ${t.period}`;
+const TIME_SLOTS = [
+  { key:"morning",   label:"Morning",   sub:"6AM–12PM", icon:<Sunrise size={14} />   },
+  { key:"afternoon", label:"Afternoon", sub:"12PM–6PM", icon:<Sun size={14} />       },
+  { key:"evening",   label:"Evening",   sub:"6PM–10PM", icon:<Sunset size={14} />    },
+  { key:"night",     label:"Night",     sub:"10PM–6AM", icon:<Moon size={14} />      },
+];
+
+const TRAIN_TYPES = [
+  { key:"Rajdhani",  color:"#f4632a" },
+  { key:"Shatabdi",  color:"#9333ea" },
+  { key:"Duronto",   color:"#748efe" },
+  { key:"Express",   color:"#0891b2" },
+  { key:"Superfast", color:"#22a85a" },
+];
+
+const AMENITIES = [
+  { key:"pantry",  label:"Pantry Car",   icon:<Utensils size={12} />     },
+  { key:"wifi",    label:"Wi-Fi",        icon:<Wifi size={12} />         },
+  { key:"eco",     label:"Eco Coach",    icon:<Leaf size={12} />         },
+  { key:"divyang", label:"Divyang Coach",icon:<Accessibility size={12} />},
+];
+
+const DEFAULT_TIME_VAL: TimeVal = { hour:7, minute:0, period:"AM" };
+
+/* ── Section ───────────────────────────────────────────────── */
+function Section({ label, open, onToggle, badge, children }: {
+  label: string; open: boolean; onToggle: ()=>void; badge?: number; children: React.ReactNode;
+}) {
+  return (
+    <div style={{ marginBottom:"4px" }}>
+      <button onClick={onToggle} aria-expanded={open}
+        style={{ width:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 0", background:"none", border:"none", cursor:"pointer", fontFamily:"inherit" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:"6px" }}>
+          <span style={{ fontSize:"13px", fontWeight:700, color:"#0f172a" }}>{label}</span>
+          {badge !== undefined && badge > 0 && (
+            <span style={{ background:"#6366f1", color:"white", borderRadius:"9999px", padding:"1px 7px", fontSize:"10px", fontWeight:700 }}>{badge}</span>
+          )}
+        </div>
+        {open ? <ChevronUp size={14} style={{ color:"#94a3b8" }} /> : <ChevronDown size={14} style={{ color:"#94a3b8" }} />}
+      </button>
+      {open && <div style={{ paddingBottom:"12px" }}>{children}</div>}
+      <div style={{ height:"1px", background:"rgba(226,232,240,0.7)" }} />
+    </div>
+  );
 }
 
-export default function FilterSidebar({ filters, onChange, onApply }: FilterSidebarProps) {
-  const [timeOpen, setTimeOpen] = useState(true);
-  const [priceOpen, setPriceOpen] = useState(true);
-  const [classOpen, setClassOpen] = useState(true);
-  const [showFromPicker, setShowFromPicker] = useState(false);
-  const [showToPicker, setShowToPicker] = useState(false);
-  const fromBtnRef = useRef<HTMLButtonElement>(null);
-  const toBtnRef   = useRef<HTMLButtonElement>(null);
+/* ── Main ──────────────────────────────────────────────────── */
+export default function FilterSidebar({ filters: rawFilters, onChange, onApply }: Props) {
+  const filters: Filters = {
+    ...rawFilters,
+    trainTypes: rawFilters.trainTypes ?? [],
+    amenities:  rawFilters.amenities  ?? [],
+  };
 
-  /* ── Responsive dual-thumb slider via pointer events ── */
+  const [open, setOpen] = useState({ time:true, price:true, cls:true, type:false, amen:false });
+  const tog = (k: keyof typeof open) => setOpen(p => ({ ...p, [k]:!p[k] }));
+
+  /* price slider */
   const trackRef = useRef<HTMLDivElement>(null);
-  const dragging = useRef<"min" | "max" | null>(null);
-
-  const pctToPrice = (pct: number) =>
-    Math.round((PRICE_MIN_ABSOLUTE + (pct / 100) * PRICE_RANGE) / 100) * 100;
-
-  const getPct = useCallback((clientX: number) => {
+  const dragging = useRef<"min"|"max"|null>(null);
+  const toPx = (pct: number) => Math.round((PRICE_MIN_ABS + (pct/100)*PRICE_RANGE)/100)*100;
+  const getPct = useCallback((cx: number) => {
     if (!trackRef.current) return 0;
     const { left, width } = trackRef.current.getBoundingClientRect();
-    return Math.max(0, Math.min(100, ((clientX - left) / width) * 100));
+    return Math.max(0, Math.min(100, ((cx-left)/width)*100));
   }, []);
+  const onPD = (th: "min"|"max") => (e: React.PointerEvent) => { e.currentTarget.setPointerCapture(e.pointerId); dragging.current = th; };
+  const onPM = useCallback((e: React.PointerEvent) => {
+    if (!dragging.current) return;
+    const p = toPx(getPct(e.clientX));
+    if (dragging.current==="min" && p < filters.priceMax-MIN_GAP) onChange({ ...filters, priceMin:p });
+    if (dragging.current==="max" && p > filters.priceMin+MIN_GAP) onChange({ ...filters, priceMax:p });
+  }, [filters, onChange, getPct]);
+  const onPU = useCallback(() => { dragging.current=null; }, []);
 
-  const onPointerDown = (thumb: "min" | "max") => (e: React.PointerEvent) => {
-    e.currentTarget.setPointerCapture(e.pointerId);
-    dragging.current = thumb;
+  const minPct = ((filters.priceMin-PRICE_MIN_ABS)/PRICE_RANGE)*100;
+  const maxPct = ((filters.priceMax-PRICE_MIN_ABS)/PRICE_RANGE)*100;
+  const activeBarCount = Math.round((maxPct/100)*PRICE_BARS.length);
+
+  /* toggles */
+  const togCls  = (k:string) => onChange({ ...filters, seatClasses: filters.seatClasses.includes(k) ? filters.seatClasses.filter(x=>x!==k) : [...filters.seatClasses,k] });
+  const togType = (k:string) => onChange({ ...filters, trainTypes:  filters.trainTypes.includes(k)  ? filters.trainTypes.filter(x=>x!==k)  : [...filters.trainTypes,k] });
+  const togAmen = (k:string) => onChange({ ...filters, amenities:   filters.amenities.includes(k)   ? filters.amenities.filter(x=>x!==k)   : [...filters.amenities,k] });
+
+  /* time slot */
+  const h = filters.fromTime.hour, p = filters.fromTime.period;
+  const activeSlot = (p==="AM"&&h>=6&&h<12)?"morning":(p==="PM"&&h>=12&&h<18)?"afternoon":(p==="PM"&&h>=18)?"evening":"night";
+  const setSlot = (k:string) => {
+    const m:Record<string,TimeVal> = { morning:{hour:6,minute:0,period:"AM"}, afternoon:{hour:12,minute:0,period:"PM"}, evening:{hour:18,minute:0,period:"PM"}, night:{hour:22,minute:0,period:"PM"} };
+    onChange({ ...filters, fromTime: m[k]??DEFAULT_TIME_VAL });
   };
 
-  const onPointerMove = useCallback(
-    (e: React.PointerEvent) => {
-      if (!dragging.current) return;
-      const pct = getPct(e.clientX);
-      const price = pctToPrice(pct);
-      if (dragging.current === "min") {
-        if (price < filters.priceMax - MIN_GAP)
-          onChange({ ...filters, priceMin: price });
-      } else {
-        if (price > filters.priceMin + MIN_GAP)
-          onChange({ ...filters, priceMax: price });
-      }
-    },
-    [filters, onChange, getPct]
-  );
+  const activeCount = filters.seatClasses.length + filters.trainTypes.length + filters.amenities.length
+    + (filters.priceMin>PRICE_MIN_ABS||filters.priceMax<PRICE_MAX_ABS?1:0);
 
-  const onPointerUp = useCallback(() => {
-    dragging.current = null;
-  }, []);
-
-  const minPct = ((filters.priceMin - PRICE_MIN_ABSOLUTE) / PRICE_RANGE) * 100;
-  const maxPct = ((filters.priceMax - PRICE_MIN_ABSOLUTE) / PRICE_RANGE) * 100;
-
-  /* active bar count based on priceMax */
-  const activeBarCount = Math.round((maxPct / 100) * PRICE_BAR_HEIGHTS.length);
-
-  const toggleClass = (key: string) => {
-    const next = filters.seatClasses.includes(key)
-      ? filters.seatClasses.filter((c) => c !== key)
-      : [...filters.seatClasses, key];
-    onChange({ ...filters, seatClasses: next });
-  };
-
-  const resetFilters = () => {
-    onChange({
-      seatClasses: [],
-      priceMin: PRICE_MIN_ABSOLUTE,
-      priceMax: PRICE_MAX_ABSOLUTE,
-      fromTime: { hour: 7, minute: 0, period: "AM" },
-      toTime:   { hour: 6, minute: 0, period: "PM" },
-    });
-  };
+  const resetAll = () => onChange({ seatClasses:[], priceMin:PRICE_MIN_ABS, priceMax:PRICE_MAX_ABS,
+    fromTime:DEFAULT_TIME_VAL, toTime:{hour:22,minute:0,period:"PM"}, trainTypes:[], amenities:[] });
 
   return (
-    <aside
-      style={{
-        width: "260px",
-        background: "#ffffff",
-        borderRadius: "12px",
-        border: "1px solid #e8ebed",
-        boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
-        padding: "20px",
-        display: "flex",
-        flexDirection: "column",
-      }}
-      aria-label="Search filters"
-    >
-      {/* ── Header ── */}
-      <div className="flex items-center justify-between mb-4">
-        <span style={{ fontSize: "16px", fontWeight: 600, color: "#181d2a" }}>Filters</span>
-        <button
-          onClick={resetFilters}
-          className="focus:outline-none focus-visible:ring-2 rounded"
-          style={{ fontSize: "14px", color: "#748efe", fontWeight: 500 }}
-          aria-label="Reset all filters"
-        >
-          Reset
+    <aside style={{ width:"260px", background:"#ffffff", borderRadius:"16px", border:"1px solid #e2e8f0", boxShadow:"0 2px 12px rgba(0,0,0,0.07)", padding:"18px 16px 16px", display:"flex", flexDirection:"column" }} aria-label="Search filters">
+
+      {/* Header */}
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"14px" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:"7px" }}>
+          <SlidersHorizontal size={15} style={{ color:"#6366f1" }} />
+          <span style={{ fontSize:"15px", fontWeight:700, color:"#0f172a" }}>Filters</span>
+          {activeCount>0 && <span style={{ background:"#6366f1", color:"white", borderRadius:"9999px", padding:"2px 8px", fontSize:"11px", fontWeight:700 }}>{activeCount}</span>}
+        </div>
+        <button onClick={resetAll} style={{ display:"flex", alignItems:"center", gap:"4px", background:"none", border:"none", cursor:"pointer", fontSize:"12px", color:"#6366f1", fontWeight:600, fontFamily:"inherit" }}>
+          <RotateCcw size={11} /> Reset all
         </button>
       </div>
 
-      {/* ── TIME ── */}
-      <div>
-        <button
-          className="flex items-center justify-between w-full py-2 focus:outline-none focus-visible:ring-2 rounded"
-          onClick={() => setTimeOpen((v) => !v)}
-          aria-expanded={timeOpen}
-        >
-          <span style={{ fontSize: "14px", fontWeight: 600, color: "#181d2a" }}>Time</span>
-          {timeOpen
-            ? <ChevronUp size={16} style={{ color: "#9ca3af" }} />
-            : <ChevronDown size={16} style={{ color: "#9ca3af" }} />}
-        </button>
+      {/* Departure Time */}
+      <Section label="Departure Time" open={open.time} onToggle={() => tog("time")}>
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"6px" }}>
+          {TIME_SLOTS.map(s => {
+            const active = activeSlot === s.key;
+            return (
+              <button key={s.key} onClick={() => setSlot(s.key)}
+                style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:"3px", padding:"10px 6px", borderRadius:"10px", border:`1.5px solid ${active?"#6366f1":"#e2e8f0"}`, background:active?"rgba(99,102,241,0.07)":"#fafafa", cursor:"pointer", fontFamily:"inherit", transition:"all 0.15s" }}>
+                <span style={{ color:active?"#6366f1":"#64748b" }}>{s.icon}</span>
+                <span style={{ fontSize:"12px", fontWeight:700, color:active?"#6366f1":"#0f172a" }}>{s.label}</span>
+                <span style={{ fontSize:"10px", color:"#94a3b8" }}>{s.sub}</span>
+              </button>
+            );
+          })}
+        </div>
+      </Section>
 
-        {timeOpen && (
-          <div style={{ marginTop: "8px", marginBottom: "12px" }}>
-            <p style={{ fontSize: "12px", color: "#9ca3af", marginBottom: "8px" }}>
-              Departure date
-            </p>
-            <div className="flex items-center gap-2">
-              {/* From chip */}
-              <div className="flex-1">
-                <button
-                  ref={fromBtnRef}
-                  onClick={() => { setShowFromPicker((v) => !v); setShowToPicker(false); }}
-                  className="flex items-center gap-1.5 w-full focus:outline-none hover:bg-gray-50 transition-colors"
-                  style={{
-                    border: "1px solid #e8ebed", borderRadius: "8px",
-                    height: "36px", padding: "0 8px",
-                    fontSize: "12px", color: "#181d2a", fontWeight: 500,
-                    background: "#ffffff",
-                  }}
-                  aria-label={`From: ${formatTime(filters.fromTime)}`}
-                  aria-expanded={showFromPicker}
-                  aria-haspopup="dialog"
-                >
-                  <CalendarDays size={12} style={{ color: "#9ca3af", flexShrink: 0 }} />
-                  <span>{formatTime(filters.fromTime)}</span>
-                </button>
-                {showFromPicker && (
-                  <TimePicker
-                    value={filters.fromTime}
-                    onChange={(v) => onChange({ ...filters, fromTime: v })}
-                    onClose={() => setShowFromPicker(false)}
-                    triggerRef={fromBtnRef}
-                  />
-                )}
-              </div>
+      {/* Price Range */}
+      <Section label="Price Range" open={open.price} onToggle={() => tog("price")} badge={filters.priceMin>PRICE_MIN_ABS||filters.priceMax<PRICE_MAX_ABS?1:undefined}>
+        <div style={{ display:"flex", alignItems:"flex-end", gap:"2px", height:"44px", marginBottom:"10px" }} aria-hidden>
+          {PRICE_BARS.map((h,i) => <div key={i} style={{ flex:1, borderRadius:"2px", height:`${h}%`, background:i<activeBarCount?"#6366f1":"#e2e8f0", minWidth:"5px" }} />)}
+        </div>
+        <div style={{ display:"flex", justifyContent:"space-between", marginBottom:"10px" }}>
+          <span style={{ fontSize:"13px", fontWeight:700, color:"#0f172a" }}>₹{filters.priceMin.toLocaleString("en-IN")}</span>
+          <span style={{ fontSize:"13px", fontWeight:700, color:"#0f172a" }}>₹{filters.priceMax.toLocaleString("en-IN")}</span>
+        </div>
+        <div ref={trackRef} style={{ position:"relative", height:"24px", display:"flex", alignItems:"center" }}
+          onPointerMove={onPM} onPointerUp={onPU} onPointerLeave={onPU} role="group" aria-label="Price range slider">
+          <div aria-hidden style={{ position:"absolute", left:0, right:0, height:"4px", borderRadius:"9999px", background:"#e2e8f0" }} />
+          <div aria-hidden style={{ position:"absolute", left:`${minPct}%`, width:`${maxPct-minPct}%`, height:"4px", borderRadius:"9999px", background:"#6366f1", pointerEvents:"none" }} />
+          {(["min","max"] as const).map(th => (
+            <div key={th} role="slider" tabIndex={0}
+              aria-label={th==="min"?"Minimum price":"Maximum price"}
+              aria-valuemin={PRICE_MIN_ABS} aria-valuemax={PRICE_MAX_ABS}
+              aria-valuenow={th==="min"?filters.priceMin:filters.priceMax}
+              onPointerDown={onPD(th)}
+              onKeyDown={e => {
+                const step = e.shiftKey?500:100;
+                if (e.key==="ArrowLeft") { e.preventDefault(); if(th==="min"){const v=Math.max(PRICE_MIN_ABS,filters.priceMin-step);if(v<filters.priceMax-MIN_GAP)onChange({...filters,priceMin:v});}else{onChange({...filters,priceMax:Math.max(filters.priceMin+MIN_GAP,filters.priceMax-step)});} }
+                if (e.key==="ArrowRight"){ e.preventDefault(); if(th==="min"){onChange({...filters,priceMin:Math.min(filters.priceMax-MIN_GAP,filters.priceMin+step)});}else{onChange({...filters,priceMax:Math.min(PRICE_MAX_ABS,filters.priceMax+step)});} }
+              }}
+              style={{ position:"absolute", left:`${th==="min"?minPct:maxPct}%`, transform:"translateX(-50%)", width:"18px", height:"18px", borderRadius:"50%", background:"#ffffff", border:"2.5px solid #6366f1", boxShadow:"0 1px 4px rgba(99,102,241,0.35)", cursor:"grab", zIndex:th==="max"?4:3, touchAction:"none" }}
+            />
+          ))}
+        </div>
+      </Section>
 
-              <ArrowRight size={14} style={{ color: "#9ca3af", flexShrink: 0 }} />
+      {/* Seat Class */}
+      <Section label="Seat Class" open={open.cls} onToggle={() => tog("cls")} badge={filters.seatClasses.length||undefined}>
+        <div style={{ display:"flex", flexWrap:"wrap", gap:"6px" }}>
+          {SEAT_CLASSES.map(({ key, code, count }) => {
+            const active = filters.seatClasses.includes(key);
+            return (
+              <button key={key} onClick={() => togCls(key)}
+                style={{ display:"flex", alignItems:"center", gap:"5px", padding:"6px 12px", borderRadius:"9999px", border:`1.5px solid ${active?"#6366f1":"#e2e8f0"}`, background:active?"#6366f1":"#fafafa", cursor:"pointer", fontFamily:"inherit", transition:"all 0.15s", flexShrink:0 }}>
+                {active && <Check size={11} color="white" strokeWidth={3} />}
+                <span style={{ fontSize:"12px", fontWeight:600, color:active?"white":"#334155" }}>{code}</span>
+                <span style={{ fontSize:"11px", color:active?"rgba(255,255,255,0.7)":"#94a3b8" }}>({count})</span>
+              </button>
+            );
+          })}
+        </div>
+      </Section>
 
-              {/* To chip */}
-              <div className="flex-1">
-                <button
-                  ref={toBtnRef}
-                  onClick={() => { setShowToPicker((v) => !v); setShowFromPicker(false); }}
-                  className="flex items-center gap-1.5 w-full focus:outline-none hover:bg-gray-50 transition-colors"
-                  style={{
-                    border: "1px solid #e8ebed", borderRadius: "8px",
-                    height: "36px", padding: "0 8px",
-                    fontSize: "12px", color: "#181d2a", fontWeight: 500,
-                    background: "#ffffff",
-                  }}
-                  aria-label={`To: ${formatTime(filters.toTime)}`}
-                  aria-expanded={showToPicker}
-                  aria-haspopup="dialog"
-                >
-                  <CalendarDays size={12} style={{ color: "#9ca3af", flexShrink: 0 }} />
-                  <span>{formatTime(filters.toTime)}</span>
-                </button>
-                {showToPicker && (
-                  <TimePicker
-                    value={filters.toTime}
-                    onChange={(v) => onChange({ ...filters, toTime: v })}
-                    onClose={() => setShowToPicker(false)}
-                    triggerRef={toBtnRef}
-                  />
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+      {/* Train Type */}
+      <Section label="Train Type" open={open.type} onToggle={() => tog("type")} badge={filters.trainTypes.length||undefined}>
+        <div style={{ display:"flex", flexWrap:"wrap", gap:"6px" }}>
+          {TRAIN_TYPES.map(({ key, color }) => {
+            const active = filters.trainTypes.includes(key);
+            return (
+              <button key={key} onClick={() => togType(key)}
+                style={{ padding:"5px 12px", borderRadius:"9999px", border:`1.5px solid ${active?color:"#e2e8f0"}`, background:active?color:"#fafafa", cursor:"pointer", fontFamily:"inherit", transition:"all 0.15s" }}>
+                <span style={{ fontSize:"12px", fontWeight:600, color:active?"white":"#334155" }}>{key}</span>
+              </button>
+            );
+          })}
+        </div>
+      </Section>
 
-      <div style={{ height: "1px", background: "#e8ebed", margin: "4px 0 8px" }} />
+      {/* Amenities */}
+      <Section label="Amenities" open={open.amen} onToggle={() => tog("amen")} badge={filters.amenities.length||undefined}>
+        <div style={{ display:"flex", flexDirection:"column", gap:"6px" }}>
+          {AMENITIES.map(({ key, label, icon }) => {
+            const active = filters.amenities.includes(key);
+            return (
+              <button key={key} onClick={() => togAmen(key)}
+                style={{ display:"flex", alignItems:"center", gap:"8px", padding:"8px 10px", borderRadius:"10px", border:`1.5px solid ${active?"#6366f1":"#e2e8f0"}`, background:active?"rgba(99,102,241,0.06)":"#fafafa", cursor:"pointer", fontFamily:"inherit", textAlign:"left", transition:"all 0.15s" }}>
+                <span style={{ color:active?"#6366f1":"#64748b", display:"flex" }}>{icon}</span>
+                <span style={{ fontSize:"13px", fontWeight:500, color:active?"#3730a3":"#334155", flex:1 }}>{label}</span>
+                {active && <Check size={12} style={{ color:"#6366f1" }} strokeWidth={3} />}
+              </button>
+            );
+          })}
+        </div>
+      </Section>
 
-      {/* ── PRICE RANGE ── */}
-      <div>
-        <button
-          className="flex items-center justify-between w-full py-2 focus:outline-none focus-visible:ring-2 rounded"
-          onClick={() => setPriceOpen((v) => !v)}
-          aria-expanded={priceOpen}
-        >
-          <span style={{ fontSize: "14px", fontWeight: 600, color: "#181d2a" }}>Price range</span>
-          {priceOpen
-            ? <ChevronUp size={16} style={{ color: "#9ca3af" }} />
-            : <ChevronDown size={16} style={{ color: "#9ca3af" }} />}
-        </button>
-
-        {priceOpen && (
-          <div style={{ marginTop: "8px", marginBottom: "12px" }}>
-
-            {/* Bar chart */}
-            <div
-              className="flex items-end gap-[3px] mb-3"
-              style={{ height: "52px" }}
-              aria-hidden="true"
-            >
-              {PRICE_BAR_HEIGHTS.map((h, i) => (
-                <div
-                  key={i}
-                  className="flex-1 rounded-sm transition-colors duration-200"
-                  style={{
-                    height: `${h}%`,
-                    background: i < activeBarCount ? "#748efe" : "#e8ebed",
-                    minWidth: "6px",
-                  }}
-                />
-              ))}
-            </div>
-
-            {/* Price labels */}
-            <div className="flex justify-between mb-3">
-              <span style={{ fontSize: "11px", color: "#9ca3af" }}>
-                ₹{filters.priceMin.toLocaleString("en-IN")}
-              </span>
-              <span style={{ fontSize: "11px", color: "#9ca3af" }}>
-                ₹{filters.priceMax.toLocaleString("en-IN")}
-              </span>
-            </div>
-
-            {/*
-              ── Responsive single-line dual-thumb slider ──
-              Uses pointer events on the track + two draggable thumb divs.
-              No stacked <input type="range"> — fully responsive to container width.
-            */}
-            <div
-              ref={trackRef}
-              className="relative"
-              style={{ height: "24px", display: "flex", alignItems: "center", cursor: "default" }}
-              onPointerMove={onPointerMove}
-              onPointerUp={onPointerUp}
-              onPointerLeave={onPointerUp}
-              role="group"
-              aria-label="Price range slider"
-            >
-              {/* Grey base track */}
-              <div
-                aria-hidden="true"
-                style={{
-                  position: "absolute", left: 0, right: 0,
-                  height: "4px", borderRadius: "9999px",
-                  background: "#e8ebed",
-                }}
-              />
-
-              {/* Indigo active fill */}
-              <div
-                aria-hidden="true"
-                style={{
-                  position: "absolute",
-                  left: `${minPct}%`,
-                  width: `${maxPct - minPct}%`,
-                  height: "4px", borderRadius: "9999px",
-                  background: "#748efe",
-                  pointerEvents: "none",
-                }}
-              />
-
-              {/* MIN thumb */}
-              <div
-                role="slider"
-                tabIndex={0}
-                aria-label="Minimum price"
-                aria-valuemin={PRICE_MIN_ABSOLUTE}
-                aria-valuemax={PRICE_MAX_ABSOLUTE}
-                aria-valuenow={filters.priceMin}
-                onPointerDown={onPointerDown("min")}
-                onKeyDown={(e) => {
-                  const step = e.shiftKey ? 500 : 100;
-                  if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
-                    e.preventDefault();
-                    const v = Math.max(PRICE_MIN_ABSOLUTE, filters.priceMin - step);
-                    if (v < filters.priceMax - MIN_GAP) onChange({ ...filters, priceMin: v });
-                  }
-                  if (e.key === "ArrowRight" || e.key === "ArrowUp") {
-                    e.preventDefault();
-                    const v = Math.min(filters.priceMax - MIN_GAP, filters.priceMin + step);
-                    onChange({ ...filters, priceMin: v });
-                  }
-                }}
-                style={{
-                  position: "absolute",
-                  left: `${minPct}%`,
-                  transform: "translateX(-50%)",
-                  width: "18px", height: "18px",
-                  borderRadius: "50%",
-                  background: "#ffffff",
-                  border: "2.5px solid #748efe",
-                  boxShadow: "0 1px 4px rgba(116,142,254,0.4)",
-                  cursor: "grab",
-                  zIndex: 3,
-                  touchAction: "none",
-                  transition: "box-shadow 0.15s",
-                }}
-                className="focus:outline-none focus-visible:ring-2 hover:shadow-[0_0_0_5px_rgba(116,142,254,0.18)]"
-              />
-
-              {/* MAX thumb */}
-              <div
-                role="slider"
-                tabIndex={0}
-                aria-label="Maximum price"
-                aria-valuemin={PRICE_MIN_ABSOLUTE}
-                aria-valuemax={PRICE_MAX_ABSOLUTE}
-                aria-valuenow={filters.priceMax}
-                onPointerDown={onPointerDown("max")}
-                onKeyDown={(e) => {
-                  const step = e.shiftKey ? 500 : 100;
-                  if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
-                    e.preventDefault();
-                    const v = Math.max(filters.priceMin + MIN_GAP, filters.priceMax - step);
-                    onChange({ ...filters, priceMax: v });
-                  }
-                  if (e.key === "ArrowRight" || e.key === "ArrowUp") {
-                    e.preventDefault();
-                    const v = Math.min(PRICE_MAX_ABSOLUTE, filters.priceMax + step);
-                    onChange({ ...filters, priceMax: v });
-                  }
-                }}
-                style={{
-                  position: "absolute",
-                  left: `${maxPct}%`,
-                  transform: "translateX(-50%)",
-                  width: "18px", height: "18px",
-                  borderRadius: "50%",
-                  background: "#ffffff",
-                  border: "2.5px solid #748efe",
-                  boxShadow: "0 1px 4px rgba(116,142,254,0.4)",
-                  cursor: "grab",
-                  zIndex: 4,
-                  touchAction: "none",
-                  transition: "box-shadow 0.15s",
-                }}
-                className="focus:outline-none focus-visible:ring-2 hover:shadow-[0_0_0_5px_rgba(116,142,254,0.18)]"
-              />
-            </div>
-
-          </div>
-        )}
-      </div>
-
-      <div style={{ height: "1px", background: "#e8ebed", margin: "4px 0 8px" }} />
-
-      {/* ── SEAT CLASS (replaces Facilities) ── */}
-      <div style={{ marginBottom: "16px" }}>
-        <button
-          className="flex items-center justify-between w-full py-2 focus:outline-none focus-visible:ring-2 rounded"
-          onClick={() => setClassOpen((v) => !v)}
-          aria-expanded={classOpen}
-        >
-          <span style={{ fontSize: "14px", fontWeight: 600, color: "#181d2a" }}>Seat Class</span>
-          {classOpen
-            ? <ChevronUp size={16} style={{ color: "#9ca3af" }} />
-            : <ChevronDown size={16} style={{ color: "#9ca3af" }} />}
-        </button>
-
-        {classOpen && (
-          <div style={{ marginTop: "8px", display: "flex", flexDirection: "column", gap: "10px" }}>
-            {SEAT_CLASSES.map(({ key, label }) => {
-              const isChecked = filters.seatClasses.includes(key);
-              return (
-                <label
-                  key={key}
-                  className="flex items-center gap-2.5 cursor-pointer select-none"
-                  style={{ minHeight: "28px" }}
-                >
-                  <button
-                    role="checkbox"
-                    aria-checked={isChecked}
-                    onClick={() => toggleClass(key)}
-                    className="focus:outline-none focus-visible:ring-2 flex items-center justify-center flex-shrink-0"
-                    style={{
-                      width: "18px", height: "18px",
-                      borderRadius: "4px",
-                      border: isChecked ? "none" : "1.5px solid #e8ebed",
-                      background: isChecked ? "#748efe" : "transparent",
-                      transition: "all 0.15s ease",
-                      cursor: "pointer",
-                    }}
-                    aria-label={`Filter by ${label}`}
-                  >
-                    {isChecked && <Check size={11} color="white" strokeWidth={3} />}
-                  </button>
-                  <span style={{ fontSize: "14px", color: "#181d2a", lineHeight: "1.3" }}>
-                    {label}
-                  </span>
-                </label>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* ── Apply Filters ── */}
-      <button
-        onClick={onApply}
-        className="w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 transition-opacity hover:opacity-90 active:scale-[0.98]"
-        style={{
-          background: "#181d2a", color: "#ffffff",
-          borderRadius: "12px", height: "44px",
-          fontSize: "14px", fontWeight: 600,
-          marginTop: "auto", cursor: "pointer",
-        }}
-        aria-label="Apply filters"
-      >
-        Apply Filters
+      {/* Apply */}
+      <button onClick={onApply}
+        style={{ width:"100%", height:"44px", background:"linear-gradient(135deg,#4f46e5,#6366f1)", color:"white", border:"none", borderRadius:"12px", fontSize:"14px", fontWeight:700, cursor:"pointer", fontFamily:"inherit", marginTop:"12px", boxShadow:"0 4px 12px rgba(99,102,241,0.28)", transition:"filter 0.2s, transform 0.15s" }}
+        onMouseOver={e => { const b=e.currentTarget as HTMLButtonElement; b.style.filter="brightness(1.08)"; b.style.transform="translateY(-1px)"; }}
+        onMouseOut={e => { const b=e.currentTarget as HTMLButtonElement; b.style.filter="brightness(1)"; b.style.transform="translateY(0)"; }}>
+        Apply Filters{activeCount>0?` (${activeCount})`:""}
       </button>
     </aside>
   );
