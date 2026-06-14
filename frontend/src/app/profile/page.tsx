@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { loadSessionUser } from "@/lib/auth-store";
 import BookingsNavbar      from "../my-bookings/components/BookingsNavbar";
 import ProfileInfo         from "./components/ProfileInfo";
 import AadhaarVerification from "./components/AadhaarVerification";
@@ -58,6 +59,19 @@ const SECTION_TITLE: Record<Section, string> = {
 export default function ProfilePage() {
   const [active, setActive]         = useState<Section>("profile");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    setUser(loadSessionUser());
+  }, []);
+
+  const initial = user?.fullName
+    ? user.fullName.charAt(0).toUpperCase()
+    : user?.username
+    ? user.username.charAt(0).toUpperCase()
+    : "U";
+
+  const displayName = user?.fullName || user?.username || "YatraSetu Member";
 
   const activeItem = NAV_ITEMS.find((n) => n.id === active)!;
 
@@ -92,9 +106,9 @@ export default function ProfilePage() {
               {/* Gradient header */}
               <div style={{ background: "linear-gradient(135deg,#748efe,#a78bfa)", padding: "20px 16px 18px", textAlign: "center" }}>
                 <div style={{ width: "56px", height: "56px", borderRadius: "50%", background: "rgba(255,255,255,0.25)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 10px" }}>
-                  <span style={{ fontSize: "22px", fontWeight: 800, color: "white" }}>J</span>
+                  <span style={{ fontSize: "22px", fontWeight: 800, color: "white" }}>{initial}</span>
                 </div>
-                <p style={{ fontSize: "15px", fontWeight: 700, color: "white", marginBottom: "2px" }}>Jidnyasa Patel</p>
+                <p style={{ fontSize: "15px", fontWeight: 700, color: "white", marginBottom: "2px" }}>{displayName}</p>
                 <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.75)" }}>YatraSetu Member</p>
               </div>
               {/* Stats rows */}

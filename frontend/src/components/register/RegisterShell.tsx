@@ -43,8 +43,9 @@ export default function RegisterShell({
 
               <div className="reg-card__body reg-enter">
                 {children}
-                <SecurityBadges />
               </div>
+
+              <SecurityBadges />
             </div>
           </div>
         </div>

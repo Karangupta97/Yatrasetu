@@ -23,11 +23,13 @@ function makePassenger(id: string) {
 }
 
 function mapClass(cls: ClassAvailability): SeatClass {
+  const match = cls.status.match(/\d+/);
+  const numAvailable = match ? parseInt(match[0], 10) : 0;
   return {
     code:      cls.code,
     label:     cls.label,
     price:     cls.price,
-    available: cls.available ?? 10,
+    available: cls.available ? (numAvailable || 10) : 0,
   };
 }
 

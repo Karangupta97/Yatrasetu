@@ -28,15 +28,9 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
-  height: 100%;
+  height: auto;
   min-height: 100dvh;
-}
-
-/* Desktop app shell — mobile pages manage their own scroll */
-@media (min-width: 1024px) {
-  html, body {
-    overflow: hidden;
-  }
+  overflow-y: auto;
 }
 
 /* Focus rings */
