@@ -1015,17 +1015,21 @@
 
   .tc-dashboard__body {
     overflow: visible;
+    overflow-x: hidden;          /* ← prevent body from growing wider than viewport */
     padding: 12px 16px 24px;
   }
 
   .tc-dashboard__columns {
     grid-template-columns: 1fr;
     height: auto;
+    min-width: 0;                /* ← let columns shrink inside the body */
   }
 
   .tc-dashboard__left,
   .tc-dashboard__right {
     overflow: visible;
+    min-width: 0;                /* ← prevent flex children from overflowing */
+    width: 100%;
   }
 
   .tc-recent-panel,
@@ -1041,15 +1045,22 @@
     display: flex;
   }
 
+  /* Verification: switch to flex column so NFC and QR are both full-width */
   .tc-verify-split {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: unset;
   }
 
+  .tc-verify-split__side {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  /* Hide the "OR" centre divider — irrelevant when stacked */
   .tc-verify-split__or {
-    border: none;
-    border-top: 1px solid var(--tc-gray-200);
-    border-bottom: 1px solid var(--tc-gray-200);
-    padding: 6px;
+    display: none;
   }
 }
 
@@ -1218,5 +1229,320 @@
   .tc-stats-bar__progress-fill {
     animation: none;
     transition: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE — <768px
+   All desktop layout is fully preserved above 1024px.
+   Tablet (768–1023px) inherits the existing ≤1023px rules above.
+   These rules only tighten spacing / layout for small phones.
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 767px) {
+
+  /* ── Dashboard body padding ── */
+  .tc-dashboard__body {
+    padding: 10px 12px 20px;
+  }
+
+  .tc-dashboard__columns {
+    gap: 10px;
+  }
+
+  .tc-dashboard__left,
+  .tc-dashboard__right {
+    gap: 10px;
+  }
+
+  /* ── Header: compact single-column on small phones ── */
+  .tc-header__inner {
+    padding: 8px 14px;
+    gap: 8px;
+  }
+
+  .tc-header__logo {
+    width: 34px;
+    height: 34px;
+  }
+
+  .tc-header__wordmark {
+    font-size: 16px;
+  }
+
+  .tc-header__subtitle {
+    font-size: 10px;
+  }
+
+  .tc-header__actions {
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  /* Hide profile text labels on very small screens, keep avatar */
+  .tc-header__profile-text {
+    display: none;
+  }
+
+  .tc-header__profile-chevron {
+    display: none;
+  }
+
+  .tc-header__profile {
+    padding: 4px;
+    border-radius: 8px;
+  }
+
+  .tc-header__online {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+
+  .tc-header__duty-btn {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  /* ── Stats bar: single column on phones ── */
+  .tc-stats-bar {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .tc-stats-bar__item {
+    padding: 8px 12px;
+  }
+
+  .tc-stats-bar__label {
+    font-size: 9px;
+  }
+
+  .tc-stats-bar__value {
+    font-size: 12px;
+  }
+
+  /* Progress row full-width */
+  .tc-stats-bar__item--progress {
+    grid-column: span 2;
+    border-bottom: none;
+  }
+
+  /* ── Panels: less padding ── */
+  .tc-panel {
+    padding: 12px 14px;
+    border-radius: 10px;
+  }
+
+  .tc-panel__title {
+    font-size: 13px;
+  }
+
+  /* ── Verify section: inherits flex-column from ≤1023px; just touch button sizing ── */
+  .tc-verify-split__side {
+    padding: 14px 12px;
+    gap: 6px;
+  }
+
+  .tc-verify-split__icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .tc-verify-split__heading {
+    font-size: 13px;
+  }
+
+  .tc-verify-split__desc {
+    font-size: 11px;
+  }
+
+  /* Large touch-friendly verify buttons */
+  .tc-verify-btn {
+    min-height: 44px;
+    font-size: 13px;
+    width: 100%;
+    border-radius: 10px;
+  }
+
+  /* ── Summary grid: 2×2 equal tiles ── */
+  .tc-summary-panel {
+    padding: 12px 12px 10px;
+  }
+
+  .tc-summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .tc-summary-tile {
+    padding: 10px 10px 8px;
+    border-radius: 8px;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+  }
+
+  .tc-summary-tile__icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .tc-summary-tile__value {
+    font-size: 15px;
+  }
+
+  .tc-summary-tile__label {
+    font-size: 10px;
+  }
+
+  .tc-summary-tile__trend {
+    font-size: 9px;
+  }
+
+  /* ── Recent verifications: card layout ── */
+  .tc-recent-panel {
+    padding-bottom: 12px;
+  }
+
+  /* table hidden, cards shown — already set at ≤1023px */
+  .tc-recent-card {
+    padding: 10px 12px;
+    border-radius: 8px;
+  }
+
+  .tc-recent-card__name {
+    font-size: 13px;
+  }
+
+  .tc-recent-card__meta {
+    font-size: 11px;
+  }
+
+  .tc-recent-card__route {
+    font-size: 11px;
+  }
+
+  /* ── Coach / Pass chips: wrapping row ── */
+  .tc-coach-row {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    gap: 6px;
+  }
+
+  .tc-coach-chip {
+    flex: 1 1 calc(33.333% - 6px);
+    min-width: 72px;
+  }
+
+  /* ── Revenue panel ── */
+  .tc-revenue-panel {
+    padding: 12px 12px 10px;
+  }
+
+  .tc-revenue-hero {
+    padding: 10px 12px;
+    margin-bottom: 8px;
+  }
+
+  .tc-revenue-hero__value {
+    font-size: 18px;
+  }
+
+  .tc-revenue-hero__icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .tc-revenue-footer {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  /* Express has 3-col footer — collapse to 2+1 on mobile */
+  .tc-revenue-footer > *:last-child:nth-child(3) {
+    grid-column: span 2;
+    text-align: center;
+  }
+
+  .tc-revenue-footer__label {
+    font-size: 10px;
+  }
+
+  .tc-revenue-footer__value {
+    font-size: 12px;
+  }
+
+  /* ── Alerts panel ── */
+  .tc-alerts-panel {
+    padding-bottom: 12px;
+  }
+
+  .tc-alerts-list {
+    gap: 6px;
+  }
+
+  .tc-alerts-list__button {
+    padding: 8px 10px;
+  }
+
+  .tc-alerts-list__message {
+    font-size: 11px;
+  }
+
+  .tc-alerts-list__time {
+    font-size: 10px;
+  }
+
+  /* ── Toast: full-width bottom bar on mobile ── */
+  .tc-toast {
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    max-width: none;
+    font-size: 12px;
+  }
+
+  /* ── Skeleton ── */
+  .tc-dashboard--loading {
+    padding: 12px 14px;
+  }
+}
+
+/* ── Tablet-specific tweaks (768px – 1023px) ── */
+@media (min-width: 768px) and (max-width: 1023px) {
+
+  .tc-dashboard__body {
+    padding: 14px 20px 28px;
+  }
+
+  .tc-header__inner {
+    grid-template-columns: auto 1fr auto;
+    gap: 16px;
+    padding: 10px 20px;
+  }
+
+  .tc-stats-bar {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .tc-stats-bar__item--progress {
+    grid-column: span 3;
+  }
+
+  .tc-verify-btn {
+    min-height: 40px;
+  }
+
+  .tc-summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .tc-coach-row {
+    flex-wrap: wrap;
+  }
+
+  .tc-coach-chip {
+    flex: 1 1 calc(25% - 8px);
+    min-width: 80px;
   }
 }

@@ -7,8 +7,6 @@ const nextConfig: NextConfig = {
     // Source files are fully type-checked by the IDE and diagnostics tools.
     ignoreBuildErrors: true,
   },
-  // Silence the "multiple lockfiles" warning — the monorepo root has a
-  // package-lock.json for the backend; the frontend is its own workspace.
   turbopack: {
     root: path.resolve(__dirname),
   },

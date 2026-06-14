@@ -132,3 +132,65 @@
     min-width: calc(50% - 4px);
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   LOCAL DASHBOARD — Mobile responsive additions
+   Desktop layout (≥1024px) is unchanged.
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 767px) {
+
+  /* Pass chips: 2-per-row grid on phones */
+  .tc-pass-row {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    gap: 6px;
+  }
+
+  .tc-pass-chip {
+    flex: 1 1 calc(50% - 4px);
+    min-width: calc(50% - 4px);
+    padding: 8px 8px 6px;
+    border-radius: 8px;
+  }
+
+  .tc-pass-chip__label {
+    font-size: 10px;
+  }
+
+  .tc-pass-chip__count {
+    font-size: 15px;
+  }
+
+  /* Local note below verify section */
+  .tc-local-verify-note {
+    font-size: 11px;
+    margin-top: 8px;
+  }
+
+  /* Revenue footer 2-col on local (already 2-col, keep compact) */
+  .tc-revenue-footer--local {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  /* Local badge in header */
+  .tc-local-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+
+  /* Ticket type pills — compact */
+  .tc-ticket-pill {
+    font-size: 9px;
+    padding: 2px 6px;
+  }
+}
+
+/* Tablet: pass chips 3-per-row */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .tc-pass-chip {
+    flex: 1 1 calc(33.333% - 6px);
+    min-width: calc(33.333% - 6px);
+  }
+}
