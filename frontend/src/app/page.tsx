@@ -1,12 +1,10 @@
 /**
- * YatraSetu — Landing / Home Page ( / ) v2
- *
- * Enhanced with professional animations, scroll-triggered reveals,
- * shimmer buttons, animated route SVG, count-up stats, rich route cards,
- * CTA blobs, and polished hover effects.
+ * YatraSetu — Home Page ( / ) v3
+ * Modern · Professional · Minimal Animation · Fully Responsive
  */
 
 import type { Metadata } from "next";
+import { Fragment } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -16,14 +14,14 @@ import {
   Activity,
   Users,
   Lock,
-  Award,
   Headphones,
   Smartphone,
   QrCode,
   BadgeCheck,
   Search,
   CreditCard,
-  CheckCircle,
+  ArrowRight,
+  Zap,
 } from "lucide-react";
 import "./home.css";
 import BookingsNavbar from "@/app/my-bookings/components/BookingsNavbar";
@@ -40,8 +38,7 @@ export const metadata: Metadata = {
 function AshokaEmblem() {
   return (
     <svg
-      width="26"
-      height="26"
+      width="24" height="24"
       viewBox="0 0 32 32"
       fill="none"
       aria-hidden="true"
@@ -65,12 +62,11 @@ function AshokaEmblem() {
 }
 
 /* ══════════════════════════════════════════
-   HERO — section
+   HERO
 ══════════════════════════════════════════ */
 function Hero() {
   return (
     <section className="home-hero" aria-label="Hero section">
-      {/* Background image */}
       <div className="home-hero__bg">
         <Image
           src="/train.webp"
@@ -80,59 +76,46 @@ function Hero() {
           sizes="100vw"
           className="home-hero__img"
         />
-        {/* Static gradient overlay */}
         <div className="home-hero__overlay" aria-hidden="true" />
-        {/* Animated radial gradient */}
-        <div
-          className="home-hero__gradient-anim"
-          aria-hidden="true"
-          style={{
-            background:
-              "radial-gradient(ellipse at 30% 60%, rgba(30,27,75,0.45) 0%, rgba(17,24,75,0.3) 40%, transparent 70%)",
-          }}
-        />
+        <div className="home-hero__gradient-anim" aria-hidden="true" />
       </div>
 
-      {/* Content */}
       <div className="home-hero__content">
         {/* Live badge */}
-        <div className="home-hero__badge" aria-label="System status: Live">
+        <div className="home-hero__badge" aria-label="IRCTC Authorized — Live">
           <div className="home-hero__badge-dot" aria-hidden="true" />
-          <span className="home-hero__badge-text">
-            Official IRCTC Authorized Platform — Live
-          </span>
+          <span className="home-hero__badge-text">IRCTC Authorized · Live</span>
         </div>
 
         <h1 className="home-hero__headline">
-          Travel Smarter,{" "}
-          <em>Book&nbsp;Faster</em>{" "}
-          with YatraSetu
+          Your Bridge to<br />
+          <em>Every Journey</em>
         </h1>
 
         <p className="home-hero__subline">
-          India&apos;s most trusted digital railway ticketing platform. Aadhaar-verified
-          accounts, instant digital tickets, and real-time PNR tracking — all in one
-          seamless experience.
+          Book train tickets instantly. Track PNR in real time.
         </p>
 
         <HomeHeroCta />
+      </div>
 
-        {/* Stats chips */}
-        <div className="home-hero__stats" role="list" aria-label="Platform statistics">
+      {/* ── Stats bar — pinned to bottom of hero ── */}
+      <div className="home-hero__statsbar" role="list" aria-label="Platform statistics">
+        <div className="home-hero__statsbar-inner">
           {[
             { icon: <Users size={16} />, num: "50M+", lbl: "Registered Users" },
             { icon: <Ticket size={16} />, num: "2M+", lbl: "Daily Bookings" },
             { icon: <Train size={16} />, num: "13,000+", lbl: "Train Routes" },
-          ].map(({ icon, num, lbl }) => (
-            <div key={lbl} className="home-hero__stat" role="listitem">
-              <div className="home-hero__stat-icon" aria-hidden="true">
-                {icon}
+            { icon: <ShieldCheck size={16} />, num: "100%", lbl: "Secure & Verified" },
+          ].map(({ icon, num, lbl }, i) => (
+            <Fragment key={lbl}>
+              <div className="home-hero__statsbar-item" role="listitem">
+                <span className="home-hero__statsbar-icon" aria-hidden="true">{icon}</span>
+                <span className="home-hero__statsbar-num">{num}</span>
+                <span className="home-hero__statsbar-lbl">{lbl}</span>
               </div>
-              <div>
-                <div className="home-hero__stat-num">{num}</div>
-                <div className="home-hero__stat-lbl">{lbl}</div>
-              </div>
-            </div>
+              {i < 3 && <div className="home-hero__statsbar-divider" aria-hidden="true" />}
+            </Fragment>
           ))}
         </div>
       </div>
@@ -145,46 +128,46 @@ function Hero() {
 ══════════════════════════════════════════ */
 const FEATURES = [
   {
-    icon: <ShieldCheck size={24} strokeWidth={1.75} />,
-    iconBg: "rgba(37,99,235,0.1)",
-    iconColor: "#2563eb",
+    icon: <ShieldCheck size={22} strokeWidth={1.75} />,
+    iconBg: "rgba(99,102,241,0.1)",
+    iconColor: "#4f46e5",
     title: "Aadhaar-Verified Accounts",
-    desc: "Every account is KYC-verified with Aadhaar to ensure genuine identity and maximum security for all passengers.",
+    desc: "Every account is KYC-verified with Aadhaar for genuine identity and maximum security for all passengers.",
   },
   {
-    icon: <QrCode size={24} strokeWidth={1.75} />,
-    iconBg: "rgba(22,163,74,0.1)",
-    iconColor: "#16A34A",
+    icon: <QrCode size={22} strokeWidth={1.75} />,
+    iconBg: "rgba(16,185,129,0.1)",
+    iconColor: "#059669",
     title: "Instant Digital Tickets",
     desc: "Get your QR-code digital ticket the moment you book. No printing needed — show on any device at the station.",
   },
   {
-    icon: <Activity size={24} strokeWidth={1.75} />,
-    iconBg: "rgba(37,99,235,0.1)",
+    icon: <Activity size={22} strokeWidth={1.75} />,
+    iconBg: "rgba(59,130,246,0.1)",
     iconColor: "#2563eb",
     title: "Real-Time PNR Tracking",
-    desc: "Live updates on your train status, platform changes, and seat availability straight from the IRCTC database.",
+    desc: "Live updates on train status, platform changes, and seat availability straight from the IRCTC database.",
   },
   {
-    icon: <Lock size={24} strokeWidth={1.75} />,
-    iconBg: "rgba(220,38,38,0.08)",
-    iconColor: "#DC2626",
+    icon: <Lock size={22} strokeWidth={1.75} />,
+    iconBg: "rgba(239,68,68,0.08)",
+    iconColor: "#dc2626",
     title: "Bank-Grade Security",
-    desc: "End-to-end encrypted transactions with fraud detection and multi-factor authentication protecting every booking.",
+    desc: "End-to-end encrypted transactions with fraud detection and multi-factor authentication on every booking.",
   },
   {
-    icon: <Smartphone size={24} strokeWidth={1.75} />,
-    iconBg: "rgba(37,99,235,0.1)",
-    iconColor: "#2563eb",
+    icon: <Smartphone size={22} strokeWidth={1.75} />,
+    iconBg: "rgba(99,102,241,0.1)",
+    iconColor: "#4f46e5",
     title: "Works Offline (PWA)",
-    desc: "Install YatraSetu as a progressive web app. View your tickets and PNR status even without internet connectivity.",
+    desc: "Install YatraSetu as a progressive web app. View tickets and PNR status even without internet connectivity.",
   },
   {
-    icon: <Headphones size={24} strokeWidth={1.75} />,
+    icon: <Headphones size={22} strokeWidth={1.75} />,
     iconBg: "rgba(245,158,11,0.1)",
-    iconColor: "#D97706",
+    iconColor: "#d97706",
     title: "24/7 Customer Support",
-    desc: "Dedicated support team available round the clock via chat, call, or email to resolve any booking issue fast.",
+    desc: "Dedicated support via chat, call, or email round the clock to resolve any booking issue instantly.",
   },
 ];
 
@@ -193,22 +176,22 @@ function Features() {
     <section id="features" className="home-features" aria-labelledby="features-title">
       <div className="home-section">
         <div className="home-section__eyebrow" aria-hidden="true">
-          <BadgeCheck size={14} />
+          <BadgeCheck size={13} />
           Everything You Need
         </div>
         <h2 id="features-title" className="home-section__title">
           Built for India&apos;s Railways
         </h2>
         <p className="home-section__subtitle">
-          YatraSetu combines government-grade security with a modern, intuitive interface so
-          you can focus on the journey — not the paperwork.
+          YatraSetu combines government-grade security with a modern, intuitive interface
+          so you can focus on the journey — not the paperwork.
         </p>
 
         <div className="home-features__grid" role="list">
           {FEATURES.map((f) => (
             <article
               key={f.title}
-              className="home-feature-card"
+              className="home-feature-card reveal"
               role="listitem"
               aria-label={f.title}
             >
@@ -235,27 +218,27 @@ function Features() {
 const STEPS = [
   {
     num: "1",
-    icon: <ShieldCheck size={20} />,
+    icon: <ShieldCheck size={18} />,
     title: "Create Account",
     desc: "Register with your email, mobile, and Aadhaar for a fully KYC-verified profile in minutes.",
   },
   {
     num: "2",
-    icon: <Search size={20} />,
+    icon: <Search size={18} />,
     title: "Search Trains",
-    desc: "Find trains by source, destination, and travel date. Filter by class, quota, and availability.",
+    desc: "Find trains by source, destination, and date. Filter by class, quota, and live availability.",
   },
   {
     num: "3",
-    icon: <CreditCard size={20} />,
+    icon: <CreditCard size={18} />,
     title: "Secure Payment",
-    desc: "Pay securely via UPI, net banking, or cards. Your transaction is protected end-to-end.",
+    desc: "Pay via UPI, net banking, or cards. Your transaction is protected end-to-end.",
   },
   {
     num: "4",
-    icon: <QrCode size={20} />,
+    icon: <QrCode size={18} />,
     title: "Get Digital Ticket",
-    desc: "Receive your QR-based digital ticket instantly. Show it at the gate — no printout needed.",
+    desc: "Receive your QR-based digital ticket instantly. Show at the gate — no printout required.",
   },
 ];
 
@@ -264,7 +247,7 @@ function HowItWorks() {
     <section id="how-it-works" className="home-hiw" aria-labelledby="hiw-title">
       <div className="home-section">
         <div className="home-section__eyebrow" aria-hidden="true">
-          <Activity size={14} />
+          <Activity size={13} />
           Simple Process
         </div>
         <h2 id="hiw-title" className="home-section__title">
@@ -275,7 +258,7 @@ function HowItWorks() {
         </p>
 
         <div className="home-hiw__steps-wrapper">
-          {/* Animated connector line (desktop only) */}
+          {/* Animated connector line — desktop only */}
           <div className="home-hiw__connector" aria-hidden="true">
             <span className="home-hiw__connector-fill" />
           </div>
@@ -298,17 +281,17 @@ function HowItWorks() {
 }
 
 /* ══════════════════════════════════════════
-   POPULAR ROUTES — Rich cards
+   POPULAR ROUTES
 ══════════════════════════════════════════ */
 const ROUTES = [
-  { from: "NDLS", fromCity: "New Delhi",  to: "CSMT", toCity: "Mumbai",    train: "Rajdhani Express",        price: "₹1,840" },
-  { from: "MAS",  fromCity: "Chennai",    to: "SBC",  toCity: "Bengaluru", train: "Brindavan Express",       price: "₹280" },
-  { from: "HWH",  fromCity: "Kolkata",    to: "NDLS", toCity: "New Delhi", train: "Duronto Express",         price: "₹1,450" },
-  { from: "PUNE", fromCity: "Pune",       to: "CSMT", toCity: "Mumbai",    train: "Deccan Queen",            price: "₹165" },
-  { from: "BPL",  fromCity: "Bhopal",     to: "NGP",  toCity: "Nagpur",    train: "Vande Bharat",            price: "₹895" },
-  { from: "ADI",  fromCity: "Ahmedabad",  to: "NDLS", toCity: "New Delhi", train: "August Kranti Raj",       price: "₹1,200" },
-  { from: "NDLS", fromCity: "New Delhi",  to: "BCT",  toCity: "Mumbai",    train: "Rajdhani Express (BCT)",  price: "₹1,760" },
-  { from: "SBC",  fromCity: "Bengaluru",  to: "MAS",  toCity: "Chennai",   train: "Brindavan Express",       price: "₹280" },
+  { from: "NDLS", fromCity: "New Delhi",  to: "CSMT", toCity: "Mumbai",    train: "Rajdhani Express",     price: "₹1,840" },
+  { from: "MAS",  fromCity: "Chennai",    to: "SBC",  toCity: "Bengaluru", train: "Brindavan Express",    price: "₹280"   },
+  { from: "HWH",  fromCity: "Kolkata",    to: "NDLS", toCity: "New Delhi", train: "Duronto Express",      price: "₹1,450" },
+  { from: "PUNE", fromCity: "Pune",       to: "CSMT", toCity: "Mumbai",    train: "Deccan Queen",         price: "₹165"   },
+  { from: "BPL",  fromCity: "Bhopal",     to: "NGP",  toCity: "Nagpur",    train: "Vande Bharat Express", price: "₹895"   },
+  { from: "ADI",  fromCity: "Ahmedabad",  to: "NDLS", toCity: "New Delhi", train: "August Kranti Raj",    price: "₹1,200" },
+  { from: "NDLS", fromCity: "New Delhi",  to: "BCT",  toCity: "Mumbai",    train: "Rajdhani (BCT)",       price: "₹1,760" },
+  { from: "SBC",  fromCity: "Bengaluru",  to: "MAS",  toCity: "Chennai",   train: "Brindavan Express",    price: "₹280"   },
 ];
 
 function PopularRoutes() {
@@ -316,15 +299,15 @@ function PopularRoutes() {
     <section id="routes" className="home-routes" aria-labelledby="routes-title">
       <div className="home-section">
         <div className="home-section__eyebrow" aria-hidden="true">
-          <Train size={14} />
+          <Train size={13} />
           Explore Routes
         </div>
         <h2 id="routes-title" className="home-section__title">
           Popular Train Routes
         </h2>
         <p className="home-section__subtitle">
-          Quick access to India&apos;s most-travelled corridors. Click a route to search
-          availability instantly.
+          Quick access to India&apos;s most-travelled corridors. Click any route to check
+          live availability instantly.
         </p>
 
         <div className="home-routes__scroll-wrapper">
@@ -332,11 +315,11 @@ function PopularRoutes() {
             {ROUTES.map((r) => (
               <Link
                 key={`${r.from}-${r.to}`}
-                href={`/passenger?from=${r.from}&to=${r.to}`}
-                className="home-route-card"
-                aria-label={`${r.from} to ${r.to} — ${r.train}`}
+                href={`/browse-tickets?from=${r.from}&to=${r.to}`}
+                className="home-route-card reveal"
+                aria-label={`${r.fromCity} to ${r.toCity} via ${r.train}`}
               >
-                {/* Station row */}
+                {/* Stations row */}
                 <div className="home-route-card__stations">
                   <div className="home-route-card__station">
                     <span className="home-route-card__code">{r.from}</span>
@@ -348,11 +331,7 @@ function PopularRoutes() {
                     <span className="home-route-card__city">{r.toCity}</span>
                   </div>
                 </div>
-
-                {/* Train name */}
                 <div className="home-route-card__train">{r.train}</div>
-
-                {/* Price badge */}
                 <div className="home-route-card__price">from {r.price}</div>
               </Link>
             ))}
@@ -363,94 +342,7 @@ function PopularRoutes() {
   );
 }
 
-/* ══════════════════════════════════════════
-   TRUST / STATS — count-up on scroll
-══════════════════════════════════════════ */
-const TRUST_ITEMS = [
-  {
-    icon: <Award size={22} strokeWidth={1.6} />,
-    countTo: "50",
-    suffix: "M+",
-    label: "Registered Users",
-  },
-  {
-    icon: <Ticket size={22} strokeWidth={1.6} />,
-    countTo: "2",
-    suffix: "M+",
-    label: "Daily Bookings",
-  },
-  {
-    icon: <Users size={22} strokeWidth={1.6} />,
-    countTo: "99.9",
-    suffix: "%",
-    label: "Uptime SLA",
-  },
-  {
-    icon: <ShieldCheck size={22} strokeWidth={1.6} />,
-    countTo: "0",
-    suffix: "",
-    label: "Data Breaches",
-  },
-  {
-    icon: <CheckCircle size={22} strokeWidth={1.6} />,
-    countTo: "0",
-    suffix: "",
-    prefix: "₹",
-    label: "Hidden Charges",
-  },
-];
 
-function TrustBand() {
-  return (
-    <section className="home-trust" aria-labelledby="trust-title">
-      <div className="home-trust__inner">
-        <div style={{ textAlign: "center", marginBottom: "48px" }}>
-          <div
-            className="home-section__eyebrow"
-            style={{ justifyContent: "center", color: "#93c5fd" }}
-            aria-hidden="true"
-          >
-            <BadgeCheck size={14} />
-            Why Millions Trust Us
-          </div>
-          <h2
-            id="trust-title"
-            style={{
-              fontSize: "clamp(1.75rem, 4vw, 2.5rem)",
-              fontWeight: 800,
-              color: "#ffffff",
-              letterSpacing: "-0.04em",
-              margin: 0,
-            }}
-          >
-            Numbers That Speak for Themselves
-          </h2>
-        </div>
-
-        <dl className="home-trust__grid">
-          {TRUST_ITEMS.map((item) => (
-            <div key={item.label} className="home-trust__item">
-              <div className="home-trust__icon-wrap" aria-hidden="true">
-                {item.icon}
-              </div>
-              {/* data-count-to triggers count-up via HomeAnimations */}
-              <dt
-                className="home-trust__num"
-                data-count-to={item.countTo}
-                data-suffix={item.suffix}
-                data-prefix={item.prefix ?? ""}
-                aria-label={`${item.prefix ?? ""}${item.countTo}${item.suffix}`}
-              >
-                {item.prefix ?? ""}{item.countTo}{item.suffix}
-              </dt>
-              <dd className="home-trust__label">{item.label}</dd>
-            </div>
-          ))}
-        </dl>
-      </div>
-    </section>
-  );
-}
 
 /* ══════════════════════════════════════════
    CTA BANNER
@@ -464,7 +356,7 @@ function CtaBanner() {
           style={{ justifyContent: "center" }}
           aria-hidden="true"
         >
-          <Train size={14} />
+          <Zap size={13} />
           Ready to travel?
         </div>
         <h2 id="cta-title" className="home-cta-banner__title">
@@ -480,7 +372,7 @@ function CtaBanner() {
             className="home-hero__btn home-hero__btn--primary"
             aria-label="Create your free YatraSetu account"
           >
-            <Ticket size={18} aria-hidden="true" />
+            <Ticket size={17} aria-hidden="true" />
             Create Free Account
           </Link>
           <Link
@@ -489,6 +381,7 @@ function CtaBanner() {
             aria-label="Sign in to your existing account"
           >
             Already have an account?
+            <ArrowRight size={15} />
           </Link>
         </div>
       </div>
@@ -504,11 +397,11 @@ function Footer() {
     <footer className="home-footer" aria-label="Site footer">
       <div className="home-footer__inner">
         <div className="home-footer__top">
-          {/* Brand column */}
+          {/* Brand */}
           <div className="home-footer__brand">
             <div className="home-footer__logo">
               <div className="home-footer__logo-box" aria-hidden="true">
-                <Train size={17} color="white" strokeWidth={2.2} />
+                <Train size={16} color="white" strokeWidth={2.2} />
               </div>
               <div className="home-footer__brand-name">
                 Yatra<span>Setu</span>
@@ -528,7 +421,7 @@ function Footer() {
           <nav aria-label="Quick links">
             <h3 className="home-footer__col-title">Quick Links</h3>
             <ul className="home-footer__links">
-              <li><Link href="/passenger">Book Ticket</Link></li>
+              <li><Link href="/browse-tickets">Book Ticket</Link></li>
               <li><Link href="/login">Sign In</Link></li>
               <li><Link href="/register">Create Account</Link></li>
               <li><Link href="/my-bookings">My Bookings</Link></li>
@@ -546,7 +439,7 @@ function Footer() {
             </ul>
           </nav>
 
-          {/* Legal */}
+          {/* Legal — hidden on mobile, shown on desktop */}
           <nav aria-label="Legal links" style={{ display: "none" }} className="home-footer__legal">
             <h3 className="home-footer__col-title">Legal</h3>
             <ul className="home-footer__links">
@@ -569,18 +462,17 @@ function Footer() {
   );
 }
 
-/* ── Page ── */
+/* ── Page root ── */
 export default function HomePage() {
   return (
     <div className="home-page">
-      {/* Client-side animation wiring (IntersectionObserver + count-up) */}
       <HomeAnimations />
       <BookingsNavbar />
       <Hero />
       <Features />
       <HowItWorks />
       <PopularRoutes />
-      <TrustBand />
+
       <CtaBanner />
       <Footer />
     </div>

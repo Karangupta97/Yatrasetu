@@ -98,7 +98,7 @@ export default function NotificationsPage() {
         <div className="flex items-center justify-between flex-wrap gap-3 mb-5">
           <div className="flex items-center gap-3">
             <Link
-              href="/passenger"
+              href="/browse-tickets"
               className="flex items-center gap-1.5 hover:opacity-70 transition-opacity focus:outline-none"
               style={{ fontSize: "13px", color: "#6b7280", textDecoration: "none" }}
             >

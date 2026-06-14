@@ -22,7 +22,7 @@ export default function HomeHeroCta() {
     return (
       <div className="home-hero__cta">
         <Link
-          href="/passenger"
+          href="/browse-tickets"
           className="home-hero__btn home-hero__btn--primary"
           aria-label="Book a ticket"
         >

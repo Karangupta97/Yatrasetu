@@ -8,7 +8,7 @@ import {
   RefreshCw, Radio, AlertCircle, CheckCircle2, Circle,
   Accessibility, TrendingUp,
 } from "lucide-react";
-import { TRAINS } from "../../passenger/data/trains";
+import { TRAINS } from "../../browse-tickets/data/trains";
 import BookingsNavbar from "../../my-bookings/components/BookingsNavbar";
 
 /* ─── Helpers ────────────────────────────────────────────── */
@@ -64,7 +64,7 @@ export default function TrainDetailPage({
         <div className="flex flex-col items-center justify-center" style={{ minHeight: "60vh", gap: "16px" }}>
           <Train size={48} style={{ color: "#e8ebed" }} />
           <p style={{ fontSize: "18px", fontWeight: 600, color: "#181d2a" }}>Train not found</p>
-          <Link href="/passenger" style={{ background: "#748efe", color: "white", borderRadius: "12px", padding: "10px 24px", fontSize: "14px", fontWeight: 600, textDecoration: "none" }}>
+          <Link href="/browse-tickets" style={{ background: "#748efe", color: "white", borderRadius: "12px", padding: "10px 24px", fontSize: "14px", fontWeight: 600, textDecoration: "none" }}>
             Browse trains
           </Link>
         </div>
@@ -112,7 +112,7 @@ export default function TrainDetailPage({
 
         {/* ── Breadcrumb ── */}
         <div className="flex items-center gap-2 mb-5">
-          <Link href="/passenger" className="flex items-center gap-1.5 hover:opacity-70 transition-opacity focus:outline-none" style={{ fontSize: "13px", color: "#6b7280", textDecoration: "none" }}>
+          <Link href="/browse-tickets" className="flex items-center gap-1.5 hover:opacity-70 transition-opacity focus:outline-none" style={{ fontSize: "13px", color: "#6b7280", textDecoration: "none" }}>
             <ArrowLeft size={14} /> Browse Trains
           </Link>
           <span style={{ width: "1px", height: "16px", background: "#e8ebed" }} />
@@ -322,7 +322,7 @@ export default function TrainDetailPage({
                   );
                 })}
               </div>
-              <Link href="/passenger" className="flex items-center justify-center gap-2 hover:opacity-90 transition-opacity" style={{ marginTop: "14px", padding: "12px", background: "#181d2a", color: "white", borderRadius: "10px", fontSize: "14px", fontWeight: 600, textDecoration: "none" }}>
+              <Link href="/browse-tickets" className="flex items-center justify-center gap-2 hover:opacity-90 transition-opacity" style={{ marginTop: "14px", padding: "12px", background: "#181d2a", color: "white", borderRadius: "10px", fontSize: "14px", fontWeight: 600, textDecoration: "none" }}>
                 <Train size={15} /> Book this train
               </Link>
             </div>

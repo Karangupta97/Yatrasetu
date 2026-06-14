@@ -67,7 +67,7 @@ export default function RegistrationSuccessPage() {
         </div>
 
         <div className="success-page__actions">
-          <Link href="/passenger" className="reg-btn reg-btn--primary" style={{ textDecoration: "none" }}>
+          <Link href="/browse-tickets" className="reg-btn reg-btn--primary" style={{ textDecoration: "none" }}>
             BROWSE TICKETS
           </Link>
           <Link

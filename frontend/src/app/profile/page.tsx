@@ -24,34 +24,34 @@ const NAV_ITEMS: {
   bg: string;
   activeBorder: string;
 }[] = [
-  {
-    id: "profile",
-    label: "Personal Details",
-    sub: "Name, age, gender, contact",
-    Icon: User,
-    color: "#6366F1",
-    bg: "#EEF2FF",
-    activeBorder: "#6366F1",
-  },
-  {
-    id: "aadhaar",
-    label: "Aadhaar Verification",
-    sub: "KYC & identity status",
-    Icon: ShieldCheck,
-    color: "#22c55e",
-    bg: "#f0fdf4",
-    activeBorder: "#22c55e",
-  },
-  {
-    id: "billing",
-    label: "Billing & Payment",
-    sub: "UPI, cards, saved methods",
-    Icon: CreditCard,
-    color: "#f59e0b",
-    bg: "#fffbeb",
-    activeBorder: "#f59e0b",
-  },
-];
+    {
+      id: "profile",
+      label: "Personal Details",
+      sub: "Name, age, gender, contact",
+      Icon: User,
+      color: "#6366F1",
+      bg: "#EEF2FF",
+      activeBorder: "#6366F1",
+    },
+    {
+      id: "aadhaar",
+      label: "Aadhaar Verification",
+      sub: "KYC & identity status",
+      Icon: ShieldCheck,
+      color: "#22c55e",
+      bg: "#f0fdf4",
+      activeBorder: "#22c55e",
+    },
+    {
+      id: "billing",
+      label: "Billing & Payment",
+      sub: "UPI, cards, saved methods",
+      Icon: CreditCard,
+      color: "#f59e0b",
+      bg: "#fffbeb",
+      activeBorder: "#f59e0b",
+    },
+  ];
 
 const SECTION_TITLE: Record<Section, string> = {
   profile: "Personal Details",
@@ -80,7 +80,7 @@ export default function ProfilePage() {
         {/* ── Page header ─────────────────────────────── */}
         <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px" }}>
           <Link
-            href="/passenger"
+            href="/browse-tickets"
             style={{
               display: "flex", alignItems: "center", gap: "6px",
               fontSize: "13px", color: "#6b7280", textDecoration: "none",
@@ -140,8 +140,8 @@ export default function ProfilePage() {
               {/* Stats row */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1px 1fr 1px 1fr", padding: "16px 0" }}>
                 {[
-                  { label: "Bookings",     value: String(profile.bookingCount) },
-                  { label: "Total Saved",  value: `₹${profile.totalSaved.toLocaleString("en-IN")}` },
+                  { label: "Bookings", value: String(profile.bookingCount) },
+                  { label: "Total Saved", value: `₹${profile.totalSaved.toLocaleString("en-IN")}` },
                   { label: "Member Since", value: profile.memberSince ?? "—" },
                 ].map(({ label, value }, i, arr) => (
                   <React.Fragment key={label}>
@@ -232,8 +232,8 @@ export default function ProfilePage() {
                 Quick Links
               </p>
               {[
-                { Icon: Train, label: "My Bookings",   href: "/my-bookings",    color: "#6366F1", bg: "#EEF2FF" },
-                { Icon: Bell,  label: "Notifications", href: "/notifications",  color: "#f59e0b", bg: "#fffbeb" },
+                { Icon: Train, label: "My Bookings", href: "/my-bookings", color: "#6366F1", bg: "#EEF2FF" },
+                { Icon: Bell, label: "Notifications", href: "/notifications", color: "#f59e0b", bg: "#fffbeb" },
               ].map(({ Icon, label, href, color, bg }) => (
                 <Link key={label} href={href}
                   className="quick-link"
@@ -409,7 +409,8 @@ export default function ProfilePage() {
         </div>
       </main>
 
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         /* Layout */
         .profile-layout {
           display: grid;

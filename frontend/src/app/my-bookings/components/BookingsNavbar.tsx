@@ -50,7 +50,7 @@ function AshokaEmblem() {
 
 /* ── Fixed nav links — always the same regardless of auth state ── */
 const NAV_LINKS = [
-  { label: "Browse Tickets", href: "/passenger" },
+  { label: "Browse Tickets", href: "/browse-tickets" },
   { label: "My Bookings",    href: "/my-bookings" },
   { label: "Contact Us",     href: "/contact" },
 ];

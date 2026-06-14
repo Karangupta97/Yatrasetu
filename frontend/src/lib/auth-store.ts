@@ -46,8 +46,8 @@ export function saveReturnTo(path: string): void {
 }
 
 export function consumeReturnTo(): string {
-  if (typeof window === "undefined") return "/passenger";
-  const path = sessionStorage.getItem(RETURN_KEY) ?? "/passenger";
+  if (typeof window === "undefined") return "/browse-tickets";
+  const path = sessionStorage.getItem(RETURN_KEY) ?? "/browse-tickets";
   sessionStorage.removeItem(RETURN_KEY);
   return path;
 }

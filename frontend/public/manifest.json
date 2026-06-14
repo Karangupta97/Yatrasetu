@@ -64,7 +64,7 @@
       "name": "Browse Tickets",
       "short_name": "Browse",
       "description": "Search for trains",
-      "url": "/passenger",
+      "url": "/browse-tickets",
       "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
     },
     {

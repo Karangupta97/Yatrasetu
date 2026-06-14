@@ -12,7 +12,7 @@ const DYNAMIC_CACHE = `yatrasetu-dynamic-${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [
   "/",
-  "/passenger",
+  "/browse-tickets",
   "/my-bookings",
   "/contact",
   "/offline",

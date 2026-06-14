@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   ArrowLeft, Copy, Check, Download, Train,
   MapPin, Share2, MessageCircle, HelpCircle,
+  ChevronRight, Shield, Clock, Zap,
 } from "lucide-react";
 import BookingsNavbar from "../components/BookingsNavbar";
 import StatusBadge from "../components/StatusBadge";
@@ -13,21 +14,31 @@ import BookingTicketModal from "../components/BookingTicketModal";
 import { MOCK_BOOKINGS, Booking } from "../data/mockBookings";
 
 /* ── Shared section card ── */
-function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
+function SectionCard({
+  title,
+  children,
+  icon,
+  accent,
+}: {
+  title: string;
+  children: React.ReactNode;
+  icon?: React.ReactNode;
+  accent?: string;
+}) {
   return (
-    <div
-      style={{
-        background: "#ffffff", borderRadius: "12px",
-        border: "1px solid #e8ebed", boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-        overflow: "hidden",
-      }}
-    >
-      <div style={{ padding: "16px 20px", borderBottom: "1px solid #f3f4f6" }}>
-        <h2 style={{ fontSize: "15px", fontWeight: 700, color: "#181d2a", margin: 0 }}>{title}</h2>
+    <div className="pnr-section-card">
+      <div className="pnr-section-header">
+        {icon && (
+          <div
+            className="pnr-section-icon"
+            style={{ background: accent ?? "linear-gradient(135deg,#6366f1,#4338ca)" }}
+          >
+            {icon}
+          </div>
+        )}
+        <h2 className="pnr-section-title">{title}</h2>
       </div>
-      <div style={{ padding: "20px" }}>
-        {children}
-      </div>
+      <div className="pnr-section-body">{children}</div>
     </div>
   );
 }
@@ -35,18 +46,29 @@ function SectionCard({ title, children }: { title: string; children: React.React
 /* ── Passenger status pill ── */
 function PaxStatus({ status }: { status: "CNF" | "RAC" | "WL" }) {
   const s = {
-    CNF: { bg: "#f0fdf4", color: "#16a34a", border: "1px solid #bbf7d0" },
-    RAC: { bg: "#fffbeb", color: "#d97706", border: "1px solid #fde68a" },
-    WL: { bg: "#eff6ff", color: "#2563eb", border: "1px solid #bfdbfe" },
+    CNF: { bg: "linear-gradient(135deg,#d1fae5,#a7f3d0)", color: "#065f46", shadow: "rgba(16,185,129,0.18)" },
+    RAC: { bg: "linear-gradient(135deg,#fef3c7,#fde68a)", color: "#92400e", shadow: "rgba(217,119,6,0.15)" },
+    WL:  { bg: "linear-gradient(135deg,#dbeafe,#bfdbfe)",  color: "#1e40af", shadow: "rgba(37,99,235,0.15)" },
   }[status];
   return (
-    <span style={{ ...s, padding: "2px 10px", borderRadius: "9999px", fontSize: "11px", fontWeight: 700 }}>
+    <span
+      style={{
+        background: s.bg,
+        color: s.color,
+        padding: "3px 12px",
+        borderRadius: "9999px",
+        fontSize: "11px",
+        fontWeight: 700,
+        boxShadow: `0 2px 8px ${s.shadow}`,
+        letterSpacing: "0.04em",
+      }}
+    >
       {status}
     </span>
   );
 }
 
-/* ── Route timeline strip (inline for detail page) ── */
+/* ── Route timeline strip ── */
 function RouteStrip({ booking }: { booking: Booking }) {
   const allPoints = [
     { city: booking.origin.name.split(" ")[0], code: booking.origin.code, time: booking.departureTime },
@@ -55,37 +77,79 @@ function RouteStrip({ booking }: { booking: Booking }) {
   ];
 
   return (
-    <div className="relative flex items-start justify-between w-full" style={{ paddingTop: "8px" }}>
-      {/* Connector line */}
+    <div style={{ position: "relative", display: "flex", alignItems: "flex-start", justifyContent: "space-between", width: "100%", paddingTop: "8px" }}>
+      {/* Gradient connector line */}
       <div
         aria-hidden="true"
         style={{
           position: "absolute", left: "12px", right: "12px",
-          top: "20px", height: "2px", background: "#748efe",
+          top: "17px", height: "3px",
+          background: "linear-gradient(90deg,#6366f1,#818cf8,#a78bfa)",
           borderRadius: "9999px",
+          boxShadow: "0 2px 8px rgba(99,102,241,0.3)",
         }}
       />
       {allPoints.map((pt, i) => (
-        <div key={i} className="flex flex-col items-center" style={{ zIndex: 1, gap: "4px", minWidth: "60px" }}>
-          {/* Dot */}
+        <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", zIndex: 1, gap: "5px", minWidth: "60px" }}>
           <div
             aria-hidden="true"
             style={{
-              width: "10px", height: "10px", borderRadius: "50%",
-              background: "#748efe", border: "2px solid #ffffff",
-              boxShadow: "0 0 0 2px #748efe",
+              width: "14px", height: "14px", borderRadius: "50%",
+              background: i === 0 || i === allPoints.length - 1
+                ? "linear-gradient(135deg,#6366f1,#4338ca)"
+                : "white",
+              border: "2.5px solid #6366f1",
+              boxShadow: "0 0 0 3px rgba(99,102,241,0.18), 0 2px 8px rgba(99,102,241,0.25)",
             }}
           />
-          <span style={{ fontSize: "11px", fontWeight: 600, color: "#181d2a", textAlign: "center", lineHeight: "1.2" }}>
+          <span style={{ fontSize: "11px", fontWeight: 700, color: "#1e1b4b", textAlign: "center", lineHeight: "1.2" }}>
             {pt.city}
           </span>
           {pt.code && (
-            <span style={{ fontSize: "10px", color: "#9ca3af", textAlign: "center" }}>{pt.code}</span>
+            <span style={{ fontSize: "10px", color: "#9ca3af", textAlign: "center", fontWeight: 500 }}>{pt.code}</span>
           )}
-          <span style={{ fontSize: "11px", color: "#6b7280", textAlign: "center" }}>{pt.time}</span>
+          <span style={{ fontSize: "10px", color: "#6366f1", textAlign: "center", fontWeight: 600 }}>{pt.time}</span>
         </div>
       ))}
     </div>
+  );
+}
+
+/* ── Action button ── */
+function ActionBtn({
+  icon,
+  label,
+  subLabel,
+  iconBg,
+  iconColor,
+  onClick,
+  disabled,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  subLabel?: string;
+  iconBg: string;
+  iconColor: string;
+  onClick?: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className="pnr-action-btn"
+      style={{ opacity: disabled ? 0.45 : 1, cursor: disabled ? "not-allowed" : "pointer" }}
+      aria-disabled={disabled}
+    >
+      <div
+        className="pnr-action-icon"
+        style={{ background: iconBg, boxShadow: `0 4px 14px ${iconColor}33` }}
+      >
+        <span style={{ color: iconColor, display: "flex" }}>{icon}</span>
+      </div>
+      <span className="pnr-action-label">{label}</span>
+      {subLabel && <span className="pnr-action-sublabel">{subLabel}</span>}
+    </button>
   );
 }
 
@@ -101,26 +165,28 @@ export default function BookingDetailPage({ params }: { params: Promise<{ pnr: s
   const [showTicket, setShowTicket] = useState(false);
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(pnr).catch(() => { });
+    navigator.clipboard.writeText(pnr).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleConfirmCancel = () => {
-    setBooking((prev) => prev ? { ...prev, status: "Cancelled" } : prev);
+    setBooking((prev) => (prev ? { ...prev, status: "Cancelled" } : prev));
     setShowCancel(false);
     setCancelDone(true);
   };
 
   if (!booking) {
     return (
-      <div style={{ minHeight: "100vh", background: "#f0f2f5" }}>
+      <div style={{ minHeight: "100vh", background: "linear-gradient(135deg,#f0f4ff 0%,#fafbff 50%,#f5f3ff 100%)" }}>
         <BookingsNavbar />
-        <main className="mx-auto flex flex-col items-center justify-center py-32" style={{ maxWidth: "900px", padding: "80px 16px" }}>
-          <p style={{ fontSize: "18px", fontWeight: 600, color: "#6b7280" }}>Booking not found.</p>
-          <Link href="/my-bookings" style={{ color: "#748efe", marginTop: "12px", fontSize: "14px" }}>
-            ← Back to bookings
-          </Link>
+        <main style={{ maxWidth: "960px", margin: "0 auto", padding: "80px 20px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+          <div className="pnr-not-found">
+            <Train size={40} color="#6366f1" />
+            <p style={{ fontSize: "20px", fontWeight: 700, color: "#1e1b4b", margin: "16px 0 8px" }}>Booking not found</p>
+            <p style={{ fontSize: "14px", color: "#6b7280" }}>We couldn't find a booking with PNR: <strong>{pnr}</strong></p>
+            <Link href="/my-bookings" className="pnr-back-home-btn">← Back to My Bookings</Link>
+          </div>
         </main>
       </div>
     );
@@ -129,165 +195,160 @@ export default function BookingDetailPage({ params }: { params: Promise<{ pnr: s
   const isCancellable = !["Cancelled", "Completed", "Refund Initiated"].includes(booking.status);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f0f2f5" }}>
+    <div style={{ minHeight: "100vh", background: "linear-gradient(150deg,#f0f4ff 0%,#fafbff 55%,#f5f3ff 100%)" }}>
       <BookingsNavbar />
 
-      <main className="mx-auto" style={{ maxWidth: "960px", padding: "20px 16px 48px" }}>
+      {/* Hero banner strip */}
+      <div className="pnr-hero-strip">
+        <div className="pnr-hero-inner">
+          <div className="pnr-hero-train-icon">
+            <Train size={22} color="white" strokeWidth={2.3} />
+          </div>
+          <span className="pnr-hero-text">Booking Details</span>
+          <ChevronRight size={16} style={{ color: "rgba(255,255,255,0.5)", margin: "0 6px" }} />
+          <span className="pnr-hero-pnr">{booking.pnr}</span>
+        </div>
+      </div>
+
+      <main className="pnr-main">
 
         {/* ── Back link ── */}
-        <Link
-          href="/my-bookings"
-          className="inline-flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 rounded mb-5 hover:opacity-70 transition-opacity"
-          style={{ fontSize: "13px", color: "#6b7280", textDecoration: "none" }}
-        >
-          <ArrowLeft size={14} /> Back to bookings
+        <Link href="/my-bookings" className="pnr-back-link">
+          <ArrowLeft size={15} />
+          Back to bookings
         </Link>
 
         {/* ── PNR header card ── */}
-        <div
-          style={{
-            background: "#ffffff", borderRadius: "12px",
-            border: "1px solid #e8ebed", padding: "20px 24px",
-            marginBottom: "16px", boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-          }}
-        >
-          <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="pnr-header-card">
+          {/* Decorative gradient blob */}
+          <div className="pnr-header-blob" aria-hidden="true" />
+
+          <div className="pnr-header-top">
             <div>
-              <p style={{ fontSize: "11px", color: "#9ca3af", fontWeight: 600, letterSpacing: "0.08em", marginBottom: "4px" }}>PNR</p>
-              <div className="flex items-center gap-3">
-                <span style={{ fontSize: "30px", fontWeight: 800, color: "#181d2a", letterSpacing: "-0.5px" }}>
-                  {booking.pnr}
-                </span>
+              <p className="pnr-label">PNR Number</p>
+              <div className="pnr-number-row">
+                <span className="pnr-number">{booking.pnr}</span>
                 <button
                   onClick={handleCopy}
-                  className="flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 rounded-lg hover:bg-gray-50 transition-colors"
-                  style={{
-                    border: "1px solid #e8ebed", borderRadius: "8px",
-                    padding: "5px 10px", fontSize: "12px", color: "#6b7280", fontWeight: 500,
-                  }}
+                  className={`pnr-copy-btn${copied ? " pnr-copy-btn--copied" : ""}`}
                   aria-label="Copy PNR"
                 >
-                  {copied ? <Check size={12} style={{ color: "#16a34a" }} /> : <Copy size={12} />}
+                  {copied ? <Check size={13} /> : <Copy size={13} />}
                   {copied ? "Copied!" : "Copy"}
                 </button>
               </div>
-              <p style={{ fontSize: "13px", color: "#6b7280", marginTop: "4px" }}>{booking.journeyDate}</p>
+              <p className="pnr-journey-date">
+                <Clock size={13} style={{ verticalAlign: "middle", marginRight: "5px" }} />
+                {booking.journeyDate}
+              </p>
             </div>
-            <div className="flex flex-col items-end gap-1">
+
+            <div className="pnr-header-status-col">
               <StatusBadge status={booking.status} size="lg" />
               {booking.chartStatus && (
-                <p style={{ fontSize: "12px", color: "#9ca3af", marginTop: "4px" }}>
-                  Chart Status:{" "}
-                  <span style={{ color: "#16a34a", fontWeight: 500 }}>{booking.chartStatus}</span>
-                </p>
+                <div className="pnr-chart-status">
+                  <Shield size={12} style={{ color: "#10b981" }} />
+                  Chart: <span style={{ color: "#10b981", fontWeight: 600 }}>{booking.chartStatus}</span>
+                </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* ── Two-column layout on desktop ── */}
-        <div className="flex gap-4 items-start flex-col md:flex-row">
+        {/* ── Two-column layout ── */}
+        <div className="pnr-layout">
 
           {/* ── LEFT COLUMN ── */}
-          <div className="flex-1 min-w-0 flex flex-col gap-4">
+          <div className="pnr-left-col">
 
             {/* Journey Summary */}
-            <SectionCard title="Journey Summary">
-              <p style={{ fontSize: "13px", color: "#6b7280", marginBottom: "12px" }}>
-                {booking.trainNumber} &nbsp;·&nbsp;
-                <span style={{ fontWeight: 600, color: "#181d2a" }}>{booking.trainName}</span>
-              </p>
+            <SectionCard
+              title="Journey Summary"
+              icon={<Train size={14} color="white" />}
+              accent="linear-gradient(135deg,#6366f1,#4338ca)"
+            >
+              {/* Train name */}
+              <div className="pnr-train-name-row">
+                <span className="pnr-train-number">{booking.trainNumber}</span>
+                <span className="pnr-train-divider">·</span>
+                <span className="pnr-train-name">{booking.trainName}</span>
+              </div>
 
-              {/* Dep / Arr times + route strip */}
-              <div className="flex items-start gap-4 mb-4">
-                {/* Departure */}
-                <div style={{ minWidth: "80px" }}>
-                  <p style={{ fontSize: "30px", fontWeight: 800, color: "#181d2a", lineHeight: 1 }}>
-                    {booking.departureTime}
-                  </p>
-                  <p style={{ fontSize: "13px", fontWeight: 600, color: "#181d2a", marginTop: "4px" }}>
-                    {booking.origin.name}
-                  </p>
-                  <p style={{ fontSize: "11px", color: "#9ca3af" }}>{booking.origin.code}</p>
+              {/* Dep / Arr + route */}
+              <div className="pnr-journey-row">
+                <div className="pnr-station pnr-station--dep">
+                  <p className="pnr-time">{booking.departureTime}</p>
+                  <p className="pnr-station-name">{booking.origin.name}</p>
+                  <p className="pnr-station-code">{booking.origin.code}</p>
                   {booking.origin.platform && (
-                    <p style={{ fontSize: "11px", color: "#9ca3af" }}>{booking.origin.platform}</p>
+                    <p className="pnr-platform">{booking.origin.platform}</p>
                   )}
-                  <p style={{ fontSize: "11px", color: "#6b7280", marginTop: "2px" }}>{booking.journeyDate}</p>
+                  <p className="pnr-station-date">{booking.journeyDate}</p>
                 </div>
 
-                {/* Center timeline */}
-                <div className="flex-1 min-w-0 px-2">
-                  <p style={{ fontSize: "11px", color: "#9ca3af", textAlign: "center", marginBottom: "4px" }}>
+                <div className="pnr-route-center">
+                  <p className="pnr-duration">
+                    <Zap size={12} style={{ verticalAlign: "middle", marginRight: "3px", color: "#6366f1" }} />
                     {booking.duration}
                   </p>
                   <RouteStrip booking={booking} />
                 </div>
 
-                {/* Arrival */}
-                <div style={{ minWidth: "80px", textAlign: "right" }}>
-                  <p style={{ fontSize: "30px", fontWeight: 800, color: "#181d2a", lineHeight: 1 }}>
-                    {booking.arrivalTime}
-                  </p>
-                  <p style={{ fontSize: "13px", fontWeight: 600, color: "#181d2a", marginTop: "4px" }}>
-                    {booking.destination.name}
-                  </p>
-                  <p style={{ fontSize: "11px", color: "#9ca3af" }}>{booking.destination.code}</p>
+                <div className="pnr-station pnr-station--arr">
+                  <p className="pnr-time">{booking.arrivalTime}</p>
+                  <p className="pnr-station-name">{booking.destination.name}</p>
+                  <p className="pnr-station-code">{booking.destination.code}</p>
                   {booking.destination.platform && (
-                    <p style={{ fontSize: "11px", color: "#9ca3af" }}>{booking.destination.platform}</p>
+                    <p className="pnr-platform">{booking.destination.platform}</p>
                   )}
                 </div>
               </div>
 
-              {/* Distance + class */}
-              <div className="flex items-center gap-2 flex-wrap" style={{ borderTop: "1px solid #f3f4f6", paddingTop: "12px" }}>
-                <span className="flex items-center gap-1" style={{ fontSize: "12px", color: "#6b7280" }}>
-                  <MapPin size={12} style={{ color: "#9ca3af" }} aria-hidden="true" />
-                  Distance: {booking.distance}
+              {/* Distance + class chips */}
+              <div className="pnr-meta-chips">
+                <span className="pnr-chip">
+                  <MapPin size={11} style={{ color: "#6366f1" }} />
+                  {booking.distance}
                 </span>
-                <span style={{ color: "#e8ebed" }}>·</span>
-                <span className="flex items-center gap-1" style={{ fontSize: "12px", color: "#6b7280" }}>
-                  <Train size={12} style={{ color: "#9ca3af" }} aria-hidden="true" />
-                  Class: {booking.seatClass} ({booking.seatClassCode})
+                <span className="pnr-chip">
+                  <Train size={11} style={{ color: "#6366f1" }} />
+                  {booking.seatClass} · {booking.seatClassCode}
                 </span>
               </div>
             </SectionCard>
 
             {/* Passenger Details */}
-            <SectionCard title="Passenger Details">
+            <SectionCard
+              title="Passenger Details"
+              icon={
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              }
+              accent="linear-gradient(135deg,#8b5cf6,#6d28d9)"
+            >
               <div style={{ overflowX: "auto" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+                <table className="pnr-table">
                   <thead>
-                    <tr style={{ borderBottom: "1px solid #f3f4f6" }}>
+                    <tr>
                       {["Passenger Name", "Age", "Gender", "Berth / Seat", "Coach", "Status"].map((h) => (
-                        <th
-                          key={h}
-                          style={{
-                            textAlign: "left", padding: "8px 12px",
-                            fontSize: "11px", fontWeight: 600, color: "#9ca3af",
-                            letterSpacing: "0.04em", textTransform: "uppercase",
-                          }}
-                        >
-                          {h}
-                        </th>
+                        <th key={h}>{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {booking.passengers.map((p, idx) => (
-                      <tr
-                        key={p.id}
-                        style={{ borderBottom: idx < booking.passengers.length - 1 ? "1px solid #f9fafb" : "none" }}
-                      >
-                        <td style={{ padding: "12px", fontWeight: 500, color: "#181d2a" }}>
-                          {idx + 1}. {p.name}
+                      <tr key={p.id}>
+                        <td className="pnr-passenger-name">
+                          <span className="pnr-pax-index">{idx + 1}</span>
+                          {p.name}
                         </td>
-                        <td style={{ padding: "12px", color: "#6b7280" }}>{p.age}</td>
-                        <td style={{ padding: "12px", color: "#6b7280" }}>{p.gender}</td>
-                        <td style={{ padding: "12px", color: "#6b7280" }}>{p.berth}</td>
-                        <td style={{ padding: "12px", color: "#6b7280" }}>{p.coach}</td>
-                        <td style={{ padding: "12px" }}>
-                          <PaxStatus status={p.status} />
-                        </td>
+                        <td>{p.age}</td>
+                        <td>{p.gender}</td>
+                        <td>{p.berth}</td>
+                        <td><span className="pnr-coach-badge">{p.coach}</span></td>
+                        <td><PaxStatus status={p.status} /></td>
                       </tr>
                     ))}
                   </tbody>
@@ -295,116 +356,77 @@ export default function BookingDetailPage({ params }: { params: Promise<{ pnr: s
               </div>
             </SectionCard>
 
-            {/* Actions */}
-            <SectionCard title="Actions">
-              <div className="flex items-center gap-4 flex-wrap">
-                {/* Download — enabled for all non-cancelled bookings */}
-                <button
-                  onClick={() => !["Cancelled", "Refund Initiated"].includes(booking.status) && setShowTicket(true)}
-                  disabled={["Cancelled", "Refund Initiated"].includes(booking.status)}
-                  className="flex flex-col items-center gap-2 focus:outline-none focus-visible:ring-2 rounded-xl hover:opacity-80 transition-opacity"
-                  style={{
-                    minWidth: "72px", padding: "12px 16px",
-                    background: ["Cancelled", "Refund Initiated"].includes(booking.status) ? "#f9fafb" : "#f0f2f5",
-                    borderRadius: "12px", border: "none",
-                    cursor: ["Cancelled", "Refund Initiated"].includes(booking.status) ? "not-allowed" : "pointer",
-                    opacity: ["Cancelled", "Refund Initiated"].includes(booking.status) ? 0.5 : 1,
-                  }}
-                  aria-label="Download e-ticket"
-                >
-                  <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: "#eff6ff", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <Download size={18} style={{ color: "#2563eb" }} />
-                  </div>
-                  <span style={{ fontSize: "12px", fontWeight: 500, color: "#181d2a", textAlign: "center" }}>Download<br />e-ticket</span>
-                </button>
-
-                {/* Cancel */}
-                <button
+            {/* Quick Actions */}
+            <SectionCard
+              title="Quick Actions"
+              icon={<Zap size={14} color="white" />}
+              accent="linear-gradient(135deg,#f59e0b,#d97706)"
+            >
+              <div className="pnr-actions-grid">
+                <ActionBtn
+                  icon={<Download size={20} />}
+                  label="Download"
+                  subLabel="e-Ticket"
+                  iconBg="linear-gradient(135deg,#dbeafe,#bfdbfe)"
+                  iconColor="#2563eb"
+                  onClick={() => !["Cancelled","Refund Initiated"].includes(booking.status) && setShowTicket(true)}
+                  disabled={["Cancelled","Refund Initiated"].includes(booking.status)}
+                />
+                <ActionBtn
+                  icon={<span style={{ fontSize: "18px", lineHeight: 1 }}>✕</span>}
+                  label={cancelDone ? "Cancelled" : "Cancel"}
+                  subLabel="booking"
+                  iconBg="linear-gradient(135deg,#fee2e2,#fecaca)"
+                  iconColor="#dc2626"
                   onClick={() => isCancellable && !cancelDone && setShowCancel(true)}
                   disabled={!isCancellable || cancelDone}
-                  className="flex flex-col items-center gap-2 focus:outline-none focus-visible:ring-2 rounded-xl hover:opacity-80 transition-opacity"
-                  style={{
-                    minWidth: "72px", padding: "12px 16px",
-                    background: !isCancellable || cancelDone ? "#f9fafb" : "#f0f2f5",
-                    borderRadius: "12px", border: "none",
-                    cursor: !isCancellable || cancelDone ? "not-allowed" : "pointer",
-                    opacity: !isCancellable || cancelDone ? 0.5 : 1,
-                  }}
-                  aria-label="Cancel booking"
-                  aria-disabled={!isCancellable || cancelDone}
-                >
-                  <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: "#fef2f2", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <span style={{ fontSize: "18px" }}>✕</span>
-                  </div>
-                  <span style={{ fontSize: "12px", fontWeight: 500, color: "#181d2a", textAlign: "center" }}>
-                    {cancelDone ? "Cancelled" : "Cancel\nbooking"}
-                  </span>
-                </button>
-
-                {/* Track train */}
-                <button
-                  className="flex flex-col items-center gap-2 focus:outline-none focus-visible:ring-2 rounded-xl hover:opacity-80 transition-opacity"
-                  style={{ minWidth: "72px", padding: "12px 16px", background: "#f0f2f5", borderRadius: "12px", border: "none", cursor: "pointer" }}
-                  aria-label="Track train"
-                >
-                  <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: "#eff6ff", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <Train size={18} style={{ color: "#748efe" }} />
-                  </div>
-                  <span style={{ fontSize: "12px", fontWeight: 500, color: "#181d2a", textAlign: "center" }}>Track<br />train</span>
-                </button>
-
-                {/* Share via WhatsApp */}
-                <button
-                  className="flex flex-col items-center gap-2 focus:outline-none focus-visible:ring-2 rounded-xl hover:opacity-80 transition-opacity"
-                  style={{ minWidth: "72px", padding: "12px 16px", background: "#f0f2f5", borderRadius: "12px", border: "none", cursor: "pointer" }}
-                  aria-label="Share via WhatsApp"
-                >
-                  <div style={{ width: "36px", height: "36px", borderRadius: "50%", background: "#f0fdf4", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <MessageCircle size={18} style={{ color: "#16a34a" }} />
-                  </div>
-                  <span style={{ fontSize: "12px", fontWeight: 500, color: "#181d2a", textAlign: "center" }}>Share via<br />WhatsApp</span>
-                </button>
+                />
+                <ActionBtn
+                  icon={<Train size={20} />}
+                  label="Track"
+                  subLabel="Train"
+                  iconBg="linear-gradient(135deg,#ede9fe,#ddd6fe)"
+                  iconColor="#7c3aed"
+                />
+                <ActionBtn
+                  icon={<MessageCircle size={20} />}
+                  label="Share"
+                  subLabel="WhatsApp"
+                  iconBg="linear-gradient(135deg,#d1fae5,#a7f3d0)"
+                  iconColor="#059669"
+                />
               </div>
             </SectionCard>
 
-            {/* Need help */}
-            <div
-              className="flex items-center justify-between flex-wrap gap-3"
-              style={{
-                background: "#fffbeb", border: "1px solid #fde68a",
-                borderRadius: "12px", padding: "16px 20px",
-              }}
-            >
-              <div className="flex items-center gap-3">
-                <HelpCircle size={20} style={{ color: "#d97706", flexShrink: 0 }} aria-hidden="true" />
-                <div>
-                  <p style={{ fontSize: "14px", fontWeight: 600, color: "#92400e" }}>Need help?</p>
-                  <p style={{ fontSize: "12px", color: "#a16207" }}>Our customer support is available 24/7 for any assistance.</p>
-                </div>
+            {/* Need Help */}
+            <div className="pnr-help-banner">
+              <div className="pnr-help-icon-wrap" aria-hidden="true">
+                <HelpCircle size={22} color="#d97706" />
               </div>
-              <button
-                className="focus:outline-none focus-visible:ring-2 hover:bg-white transition-colors"
-                style={{
-                  border: "1px solid #fbbf24", borderRadius: "8px",
-                  padding: "8px 16px", fontSize: "13px", fontWeight: 600, color: "#92400e",
-                  background: "rgba(255,255,255,0.6)", cursor: "pointer", whiteSpace: "nowrap",
-                }}
-                aria-label="Contact support"
-              >
+              <div className="pnr-help-text">
+                <p className="pnr-help-title">Need help with your booking?</p>
+                <p className="pnr-help-desc">Our support team is available 24/7 to assist you.</p>
+              </div>
+              <button className="pnr-help-btn" aria-label="Contact support">
                 Contact Support
               </button>
             </div>
           </div>
 
-          {/* ── RIGHT COLUMN (sticky on md+) ── */}
-          <div
-            className="w-full md:w-72 flex-shrink-0 flex flex-col gap-4"
-            style={{ position: "sticky", top: "80px", alignSelf: "flex-start" } as React.CSSProperties}
-          >
+          {/* ── RIGHT COLUMN ── */}
+          <div className="pnr-right-col">
 
             {/* Fare Details */}
-            <SectionCard title="Fare Details">
-              <div className="flex flex-col gap-3">
+            <SectionCard
+              title="Fare Details"
+              icon={
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+                </svg>
+              }
+              accent="linear-gradient(135deg,#10b981,#059669)"
+            >
+              <div className="pnr-fare-list">
                 {[
                   { label: "Base Fare", val: booking.fare.baseFare },
                   { label: "Reservation Charges", val: booking.fare.reservationCharges },
@@ -412,67 +434,59 @@ export default function BookingDetailPage({ params }: { params: Promise<{ pnr: s
                   { label: "Other Charges", val: booking.fare.otherCharges },
                   { label: "IRCTC Service Fee", val: booking.fare.irctcServiceFee },
                 ].map(({ label, val }) => (
-                  <div key={label} className="flex items-center justify-between">
-                    <span style={{ fontSize: "13px", color: "#6b7280" }}>{label}</span>
-                    <span style={{ fontSize: "13px", color: "#181d2a", fontWeight: 500 }}>
-                      ₹{val.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-                    </span>
+                  <div key={label} className="pnr-fare-row">
+                    <span className="pnr-fare-label">{label}</span>
+                    <span className="pnr-fare-val">₹{val.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
                   </div>
                 ))}
 
                 {booking.fare.discount !== 0 && (
-                  <div className="flex items-center justify-between">
-                    <span style={{ fontSize: "13px", color: "#6b7280" }}>
+                  <div className="pnr-fare-row pnr-fare-discount">
+                    <span className="pnr-fare-label">
                       Discount{booking.fare.discountCode ? ` (${booking.fare.discountCode})` : ""}
                     </span>
-                    <span style={{ fontSize: "13px", color: "#16a34a", fontWeight: 500 }}>
-                      ₹{booking.fare.discount.toLocaleString("en-IN")}
+                    <span className="pnr-fare-val pnr-fare-val--green">
+                      − ₹{booking.fare.discount.toLocaleString("en-IN")}
                     </span>
                   </div>
                 )}
 
-                <div style={{ borderTop: "1.5px solid #e8ebed", paddingTop: "12px", marginTop: "4px" }}>
-                  <div className="flex items-center justify-between">
-                    <span style={{ fontSize: "14px", fontWeight: 700, color: "#181d2a" }}>Total Amount</span>
-                    <span style={{ fontSize: "18px", fontWeight: 800, color: "#748efe" }}>
+                <div className="pnr-fare-total">
+                  <span className="pnr-fare-total-label">Total Amount</span>
+                  <div>
+                    <span className="pnr-fare-total-val">
                       ₹{booking.fare.total.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                     </span>
+                    <p className="pnr-fare-incl">incl. of all taxes</p>
                   </div>
-                  <p style={{ fontSize: "11px", color: "#9ca3af", marginTop: "2px", textAlign: "right" }}>
-                    (incl. of all taxes)
-                  </p>
                 </div>
               </div>
             </SectionCard>
 
             {/* Booking Info */}
-            <SectionCard title="Booking Info">
-              <div className="flex flex-col gap-3">
+            <SectionCard
+              title="Booking Info"
+              icon={<Shield size={14} color="white" />}
+              accent="linear-gradient(135deg,#3b82f6,#1d4ed8)"
+            >
+              <div className="pnr-info-list">
                 {[
                   { label: "Booking Date", val: booking.bookingInfo.bookingDate },
                   { label: "Booked From", val: booking.bookingInfo.bookedFrom },
                   { label: "Payment Method", val: booking.bookingInfo.paymentMethod },
                   { label: "Transaction ID", val: booking.bookingInfo.transactionId },
                 ].map(({ label, val }) => (
-                  <div key={label}>
-                    <p style={{ fontSize: "11px", color: "#9ca3af", marginBottom: "1px" }}>{label}</p>
-                    <p style={{ fontSize: "13px", color: "#181d2a", fontWeight: 500, wordBreak: "break-all" }}>{val}</p>
+                  <div key={label} className="pnr-info-item">
+                    <p className="pnr-info-label">{label}</p>
+                    <p className="pnr-info-val">{val}</p>
                   </div>
                 ))}
               </div>
             </SectionCard>
 
-            {/* Share button */}
-            <button
-              className="w-full flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 hover:opacity-90 active:scale-[0.97] transition-all"
-              style={{
-                background: "#25d366", color: "white",
-                borderRadius: "12px", height: "44px",
-                fontSize: "14px", fontWeight: 600, border: "none", cursor: "pointer",
-              }}
-              aria-label="Share booking via WhatsApp"
-            >
-              <Share2 size={16} />
+            {/* WhatsApp Share button */}
+            <button className="pnr-whatsapp-btn" aria-label="Share booking via WhatsApp">
+              <Share2 size={17} />
               Share via WhatsApp
             </button>
           </div>
@@ -480,7 +494,7 @@ export default function BookingDetailPage({ params }: { params: Promise<{ pnr: s
         </div>
       </main>
 
-      {/* Cancel modal */}
+      {/* Modals */}
       {showCancel && booking.refundAmount !== undefined && (
         <CancelModal
           refundAmount={booking.refundAmount}
@@ -488,14 +502,469 @@ export default function BookingDetailPage({ params }: { params: Promise<{ pnr: s
           onClose={() => setShowCancel(false)}
         />
       )}
-
-      {/* E-ticket modal — opens when Download e-ticket is clicked */}
       {showTicket && (
-        <BookingTicketModal
-          booking={booking}
-          onClose={() => setShowTicket(false)}
-        />
+        <BookingTicketModal booking={booking} onClose={() => setShowTicket(false)} />
       )}
+
+      {/* ── Styles ── */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        /* ─── Layout ─── */
+        .pnr-main {
+          max-width: 1000px;
+          margin: 0 auto;
+          padding: 24px 20px 60px;
+        }
+
+        /* ─── Hero strip ─── */
+        .pnr-hero-strip {
+          background: linear-gradient(90deg, #4338ca 0%, #6366f1 50%, #818cf8 100%);
+          padding: 10px 0;
+          box-shadow: 0 2px 12px rgba(99,102,241,0.22);
+        }
+        .pnr-hero-inner {
+          max-width: 1000px;
+          margin: 0 auto;
+          padding: 0 20px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .pnr-hero-train-icon {
+          width: 30px; height: 30px;
+          background: rgba(255,255,255,0.2);
+          border-radius: 8px;
+          display: flex; align-items: center; justify-content: center;
+          backdrop-filter: blur(4px);
+        }
+        .pnr-hero-text {
+          font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.75);
+        }
+        .pnr-hero-pnr {
+          font-size: 13px; font-weight: 700; color: #fff;
+          background: rgba(255,255,255,0.18);
+          padding: 2px 10px; border-radius: 999px;
+          letter-spacing: 0.05em;
+        }
+
+        /* ─── Back link ─── */
+        .pnr-back-link {
+          display: inline-flex; align-items: center; gap: 6px;
+          font-size: 13px; font-weight: 500; color: #6366f1;
+          text-decoration: none; margin-bottom: 18px;
+          padding: 6px 12px; border-radius: 8px;
+          background: rgba(99,102,241,0.06);
+          border: 1px solid rgba(99,102,241,0.15);
+          transition: background 0.18s, transform 0.18s;
+        }
+        .pnr-back-link:hover {
+          background: rgba(99,102,241,0.12);
+          transform: translateX(-2px);
+        }
+
+        /* ─── PNR Header card ─── */
+        .pnr-header-card {
+          background: #fff;
+          border-radius: 20px;
+          border: 1px solid rgba(99,102,241,0.1);
+          padding: 28px 32px;
+          margin-bottom: 20px;
+          box-shadow: 0 4px 24px rgba(99,102,241,0.08), 0 1px 4px rgba(0,0,0,0.04);
+          position: relative;
+          overflow: hidden;
+        }
+        .pnr-header-blob {
+          position: absolute;
+          top: -40px; right: -40px;
+          width: 180px; height: 180px;
+          background: radial-gradient(circle, rgba(99,102,241,0.08) 0%, transparent 70%);
+          border-radius: 50%;
+          pointer-events: none;
+        }
+        .pnr-header-top {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 20px;
+          flex-wrap: wrap;
+        }
+        .pnr-label {
+          font-size: 11px; font-weight: 700; color: #9ca3af;
+          letter-spacing: 0.1em; text-transform: uppercase;
+          margin-bottom: 8px;
+        }
+        .pnr-number-row {
+          display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+        }
+        .pnr-number {
+          font-size: 34px; font-weight: 900; color: #1e1b4b;
+          letter-spacing: -0.5px; line-height: 1;
+        }
+        .pnr-copy-btn {
+          display: inline-flex; align-items: center; gap: 5px;
+          font-size: 12px; font-weight: 600; color: #6366f1;
+          background: rgba(99,102,241,0.07);
+          border: 1.5px solid rgba(99,102,241,0.2);
+          border-radius: 8px; padding: 6px 12px;
+          cursor: pointer; transition: all 0.18s;
+          font-family: inherit;
+        }
+        .pnr-copy-btn:hover {
+          background: rgba(99,102,241,0.14);
+          border-color: rgba(99,102,241,0.35);
+        }
+        .pnr-copy-btn--copied {
+          color: #059669;
+          background: rgba(5,150,105,0.07) !important;
+          border-color: rgba(5,150,105,0.25) !important;
+        }
+        .pnr-journey-date {
+          font-size: 13px; color: #6b7280; margin-top: 8px; font-weight: 500;
+        }
+        .pnr-header-status-col {
+          display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+        }
+        .pnr-chart-status {
+          display: inline-flex; align-items: center; gap: 5px;
+          font-size: 12px; color: #6b7280;
+          background: rgba(16,185,129,0.07); padding: 4px 10px;
+          border-radius: 999px; border: 1px solid rgba(16,185,129,0.2);
+        }
+
+        /* ─── Two-column layout ─── */
+        .pnr-layout {
+          display: flex;
+          gap: 20px;
+          align-items: flex-start;
+        }
+        .pnr-left-col {
+          flex: 1;
+          min-width: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+        .pnr-right-col {
+          width: 280px;
+          flex-shrink: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          position: sticky;
+          top: 84px;
+          align-self: flex-start;
+        }
+
+        /* ─── Section Card ─── */
+        .pnr-section-card {
+          background: #ffffff;
+          border-radius: 18px;
+          border: 1px solid rgba(99,102,241,0.08);
+          box-shadow: 0 2px 16px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.04);
+          overflow: hidden;
+          transition: box-shadow 0.22s;
+        }
+        .pnr-section-card:hover {
+          box-shadow: 0 6px 28px rgba(99,102,241,0.09), 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .pnr-section-header {
+          display: flex; align-items: center; gap: 10px;
+          padding: 16px 20px;
+          border-bottom: 1px solid #f3f4f6;
+          background: linear-gradient(135deg, #fafbff 0%, #f8f9ff 100%);
+        }
+        .pnr-section-icon {
+          width: 28px; height: 28px;
+          border-radius: 8px;
+          display: flex; align-items: center; justify-content: center;
+          flex-shrink: 0;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .pnr-section-title {
+          font-size: 14px; font-weight: 700; color: #1e1b4b;
+          margin: 0; letter-spacing: -0.2px;
+        }
+        .pnr-section-body {
+          padding: 20px;
+        }
+
+        /* ─── Journey Summary ─── */
+        .pnr-train-name-row {
+          display: flex; align-items: center; gap: 8px;
+          margin-bottom: 18px;
+        }
+        .pnr-train-number {
+          font-size: 12px; font-weight: 700; color: #6366f1;
+          background: rgba(99,102,241,0.08);
+          padding: 3px 10px; border-radius: 999px;
+        }
+        .pnr-train-divider {
+          color: #d1d5db; font-size: 16px;
+        }
+        .pnr-train-name {
+          font-size: 14px; font-weight: 700; color: #1e1b4b;
+        }
+        .pnr-journey-row {
+          display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px;
+        }
+        .pnr-station {
+          min-width: 90px; flex-shrink: 0;
+        }
+        .pnr-station--arr {
+          text-align: right;
+        }
+        .pnr-time {
+          font-size: 32px; font-weight: 900; color: #1e1b4b;
+          line-height: 1; letter-spacing: -1px;
+        }
+        .pnr-station-name {
+          font-size: 13px; font-weight: 700; color: #374151; margin-top: 5px;
+        }
+        .pnr-station-code {
+          font-size: 11px; color: #9ca3af; font-weight: 500;
+        }
+        .pnr-platform {
+          font-size: 11px; color: #6366f1; font-weight: 600;
+          background: rgba(99,102,241,0.07);
+          padding: 1px 6px; border-radius: 4px;
+          display: inline-block; margin-top: 2px;
+        }
+        .pnr-station-date {
+          font-size: 11px; color: #9ca3af; margin-top: 3px;
+        }
+        .pnr-route-center {
+          flex: 1; min-width: 0; padding: 0 8px;
+        }
+        .pnr-duration {
+          font-size: 11px; font-weight: 600; color: #6366f1;
+          text-align: center; margin-bottom: 4px;
+        }
+        .pnr-meta-chips {
+          display: flex; flex-wrap: wrap; gap: 8px;
+          padding-top: 14px;
+          border-top: 1px solid #f3f4f6;
+        }
+        .pnr-chip {
+          display: inline-flex; align-items: center; gap: 5px;
+          font-size: 12px; color: #374151; font-weight: 500;
+          background: #f8f9ff;
+          border: 1px solid rgba(99,102,241,0.12);
+          padding: 5px 12px; border-radius: 999px;
+        }
+
+        /* ─── Passenger Table ─── */
+        .pnr-table {
+          width: 100%; border-collapse: collapse; font-size: 13px;
+        }
+        .pnr-table thead tr {
+          border-bottom: 2px solid #f0f0ff;
+        }
+        .pnr-table th {
+          text-align: left; padding: 8px 12px;
+          font-size: 10.5px; font-weight: 700; color: #9ca3af;
+          letter-spacing: 0.06em; text-transform: uppercase;
+          white-space: nowrap;
+        }
+        .pnr-table tbody tr {
+          border-bottom: 1px solid #f9fafb;
+          transition: background 0.15s;
+        }
+        .pnr-table tbody tr:last-child { border-bottom: none; }
+        .pnr-table tbody tr:hover { background: #fafbff; }
+        .pnr-table td {
+          padding: 13px 12px; color: #374151; vertical-align: middle;
+        }
+        .pnr-passenger-name {
+          display: flex !important; align-items: center; gap: 8px;
+          font-weight: 600; color: #1e1b4b !important;
+        }
+        .pnr-pax-index {
+          width: 20px; height: 20px;
+          background: linear-gradient(135deg,#6366f1,#4338ca);
+          color: white; font-size: 10px; font-weight: 700;
+          border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          flex-shrink: 0;
+        }
+        .pnr-coach-badge {
+          background: rgba(99,102,241,0.08);
+          color: #4338ca; font-weight: 700; font-size: 12px;
+          padding: 2px 8px; border-radius: 5px;
+        }
+
+        /* ─── Action Buttons ─── */
+        .pnr-actions-grid {
+          display: flex; gap: 12px; flex-wrap: wrap;
+        }
+        .pnr-action-btn {
+          display: flex; flex-direction: column; align-items: center;
+          gap: 8px; min-width: 78px; padding: 14px 12px;
+          background: #f8f9ff;
+          border: 1.5px solid rgba(99,102,241,0.1);
+          border-radius: 14px;
+          font-family: inherit; cursor: pointer;
+          transition: all 0.18s; flex: 1;
+        }
+        .pnr-action-btn:hover:not(:disabled) {
+          background: #fff;
+          box-shadow: 0 4px 16px rgba(99,102,241,0.12);
+          border-color: rgba(99,102,241,0.2);
+          transform: translateY(-2px);
+        }
+        .pnr-action-icon {
+          width: 44px; height: 44px;
+          border-radius: 14px;
+          display: flex; align-items: center; justify-content: center;
+          transition: transform 0.18s;
+        }
+        .pnr-action-btn:hover:not(:disabled) .pnr-action-icon {
+          transform: scale(1.08);
+        }
+        .pnr-action-label {
+          font-size: 12px; font-weight: 700; color: #1e1b4b; text-align: center;
+        }
+        .pnr-action-sublabel {
+          font-size: 10.5px; font-weight: 500; color: #9ca3af; text-align: center;
+          margin-top: -4px;
+        }
+
+        /* ─── Help Banner ─── */
+        .pnr-help-banner {
+          display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+          background: linear-gradient(135deg,#fffbeb 0%,#fef9ed 100%);
+          border: 1.5px solid #fde68a;
+          border-radius: 16px; padding: 16px 20px;
+          box-shadow: 0 2px 12px rgba(217,119,6,0.08);
+        }
+        .pnr-help-icon-wrap {
+          width: 40px; height: 40px;
+          background: rgba(245,158,11,0.12);
+          border-radius: 12px;
+          display: flex; align-items: center; justify-content: center;
+          flex-shrink: 0;
+        }
+        .pnr-help-text { flex: 1; min-width: 160px; }
+        .pnr-help-title {
+          font-size: 14px; font-weight: 700; color: #92400e; margin-bottom: 2px;
+        }
+        .pnr-help-desc {
+          font-size: 12px; color: #a16207;
+        }
+        .pnr-help-btn {
+          background: linear-gradient(135deg,#f59e0b,#d97706);
+          color: white; font-weight: 700; font-size: 13px;
+          border: none; border-radius: 10px;
+          padding: 9px 18px; cursor: pointer;
+          font-family: inherit;
+          box-shadow: 0 3px 10px rgba(217,119,6,0.3);
+          transition: all 0.18s; white-space: nowrap;
+        }
+        .pnr-help-btn:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 5px 16px rgba(217,119,6,0.4);
+        }
+
+        /* ─── Fare Details ─── */
+        .pnr-fare-list {
+          display: flex; flex-direction: column; gap: 10px;
+        }
+        .pnr-fare-row {
+          display: flex; justify-content: space-between; align-items: center;
+        }
+        .pnr-fare-label {
+          font-size: 13px; color: #6b7280;
+        }
+        .pnr-fare-val {
+          font-size: 13px; font-weight: 600; color: #1e1b4b;
+        }
+        .pnr-fare-val--green { color: #059669 !important; }
+        .pnr-fare-discount .pnr-fare-label { color: #059669; }
+        .pnr-fare-total {
+          display: flex; justify-content: space-between; align-items: flex-end;
+          padding-top: 14px; margin-top: 6px;
+          border-top: 2px solid #f0f0ff;
+        }
+        .pnr-fare-total-label {
+          font-size: 14px; font-weight: 800; color: #1e1b4b;
+        }
+        .pnr-fare-total-val {
+          font-size: 22px; font-weight: 900;
+          background: linear-gradient(135deg,#6366f1,#4338ca);
+          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+          background-clip: text; display: block; text-align: right;
+        }
+        .pnr-fare-incl {
+          font-size: 10px; color: #9ca3af; text-align: right; margin-top: 2px;
+        }
+
+        /* ─── Booking Info ─── */
+        .pnr-info-list {
+          display: flex; flex-direction: column; gap: 14px;
+        }
+        .pnr-info-label {
+          font-size: 10.5px; font-weight: 700; color: #9ca3af;
+          text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 2px;
+        }
+        .pnr-info-val {
+          font-size: 13px; font-weight: 600; color: #1e1b4b;
+          word-break: break-all;
+        }
+
+        /* ─── WhatsApp button ─── */
+        .pnr-whatsapp-btn {
+          width: 100%;
+          display: flex; align-items: center; justify-content: center; gap: 8px;
+          background: linear-gradient(135deg,#25d366,#1db954);
+          color: white; font-size: 14px; font-weight: 700;
+          border: none; border-radius: 14px; padding: 14px;
+          cursor: pointer; font-family: inherit;
+          box-shadow: 0 4px 16px rgba(37,211,102,0.3);
+          transition: all 0.18s;
+          letter-spacing: 0.01em;
+        }
+        .pnr-whatsapp-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(37,211,102,0.4);
+        }
+
+        /* ─── Not found ─── */
+        .pnr-not-found {
+          background: white; border-radius: 20px;
+          border: 1px solid rgba(99,102,241,0.1);
+          padding: 48px; text-align: center;
+          box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+          max-width: 420px; width: 100%;
+        }
+        .pnr-back-home-btn {
+          display: inline-block; margin-top: 20px;
+          background: linear-gradient(135deg,#6366f1,#4338ca);
+          color: white; text-decoration: none;
+          padding: 10px 24px; border-radius: 10px;
+          font-weight: 600; font-size: 14px;
+          box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+          transition: all 0.18s;
+        }
+        .pnr-back-home-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 18px rgba(99,102,241,0.4);
+        }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 700px) {
+          .pnr-layout {
+            flex-direction: column;
+          }
+          .pnr-right-col {
+            width: 100%;
+            position: static;
+          }
+          .pnr-header-card {
+            padding: 20px;
+          }
+          .pnr-number { font-size: 26px; }
+          .pnr-time { font-size: 24px; }
+          .pnr-station { min-width: 70px; }
+        }
+      `}} />
     </div>
   );
 }
