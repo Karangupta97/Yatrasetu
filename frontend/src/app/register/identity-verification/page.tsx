@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import { CheckCircle2 } from "lucide-react";
 import RegisterShell from "@/components/register/RegisterShell";
 import OtpModal from "@/components/shared/OtpModal";
-import { formatAadhaar, simulateDelay } from "@/lib/auth-utils";
+import { formatAadhaar } from "@/lib/auth-utils";
 import { onInputFocus, onInputBlur } from "@/components/register/form-utils";
 import { loadRegisterData, saveRegisterData } from "@/lib/register-store";
+import { apiGenerateAadhaarOtp, apiVerifyAadhaarOtp, type ApiError } from "@/lib/api";
+import { loadSessionUser, saveSessionUser } from "@/lib/auth-store";
 
 export default function IdentityVerificationPage() {
   const router = useRouter();
@@ -38,16 +40,35 @@ export default function IdentityVerificationPage() {
     }
     setError("");
     setAadhaarSending(true);
-    await simulateDelay(800);
-    setAadhaarSending(false);
-    setOtpModalOpen(true);
+    try {
+      await apiGenerateAadhaarOtp({ aadhaarNumber: digits, consent: "y" });
+      setOtpModalOpen(true);
+    } catch (err) {
+      const apiErr = err as ApiError;
+      setError(apiErr.message ?? "Failed to send Aadhaar OTP. Please try again.");
+      throw err;
+    } finally {
+      setAadhaarSending(false);
+    }
   }
 
-  function handleAadhaarOtpVerified() {
+  async function handleAadhaarOtpVerified(otpCode: string) {
     const digits = aadhaar.replace(/\s/g, "");
-    setAadhaarVerified(true);
-    saveRegisterData({ aadhaar: digits, aadhaarVerified: true });
-    setOtpModalOpen(false);
+    try {
+      await apiVerifyAadhaarOtp({ otp: otpCode, aadhaarNumber: digits });
+      setAadhaarVerified(true);
+      saveRegisterData({ aadhaar: digits, aadhaarVerified: true });
+
+      const sessionUser = loadSessionUser();
+      if (sessionUser) {
+        sessionUser.isAadhaarVerified = true;
+        saveSessionUser(sessionUser);
+      }
+      setOtpModalOpen(false);
+    } catch (err) {
+      const apiErr = err as ApiError;
+      throw new Error(apiErr.message ?? "Incorrect OTP. Please try again.");
+    }
   }
 
   async function handleContinue(e: React.FormEvent) {
@@ -57,7 +78,6 @@ export default function IdentityVerificationPage() {
       return;
     }
     setContinueLoading(true);
-    await simulateDelay(400);
     router.push("/register/review");
   }
 
@@ -141,6 +161,7 @@ export default function IdentityVerificationPage() {
         subtitle={`Enter the 6-digit OTP sent to ${maskedMobile}`}
         onClose={() => setOtpModalOpen(false)}
         onVerified={handleAadhaarOtpVerified}
+        onResend={sendAadhaarOtp}
       />
     </>
   );

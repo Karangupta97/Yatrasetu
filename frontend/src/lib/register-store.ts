@@ -1,4 +1,6 @@
 export interface RegisterData {
+  /** MongoDB _id returned by POST /api/auth/register — needed for verify-email and resend-otp */
+  userId: string;
   fullName: string;
   email: string;
   mobile: string;
@@ -21,6 +23,7 @@ export interface RegisterData {
 const KEY = "yatrasetu_register";
 
 export const defaultRegisterData: RegisterData = {
+  userId: "",
   fullName: "",
   email: "",
   mobile: "",

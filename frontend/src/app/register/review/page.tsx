@@ -5,14 +5,13 @@ import { useRouter } from "next/navigation";
 import { Mail, Smartphone, Fingerprint, CheckCircle2 } from "lucide-react";
 import RegisterShell from "@/components/register/RegisterShell";
 import CaptchaField from "@/components/shared/CaptchaField";
+import { saveRegistrationSuccess, setPendingWelcome } from "@/lib/auth-utils";
 import {
-  generateUsername,
-  saveRegisteredUser,
-  saveRegistrationSuccess,
-  setPendingWelcome,
-  simulateDelay,
-} from "@/lib/auth-utils";
-import { loadRegisterData, saveRegisterData, maskEmail, type RegisterData } from "@/lib/register-store";
+  loadRegisterData,
+  clearRegisterData,
+  maskEmail,
+  type RegisterData,
+} from "@/lib/register-store";
 
 function maskAadhaar(num: string) {
   if (!num || num.length < 4) return "—";
@@ -36,40 +35,26 @@ export default function ReviewPage() {
     setData(stored);
   }, [router]);
 
-  const usernamePreview = data
-    ? generateUsername(data.firstName, data.mobile)
-    : "";
-
-  const canSubmit =
-    confirmed &&
-    captchaValid &&
-    data?.emailVerified &&
-    data?.aadhaarVerified;
+  const canSubmit = confirmed && captchaValid && !!data?.emailVerified && !!data?.aadhaarVerified;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!data || !canSubmit) return;
 
     setLoading(true);
-    await simulateDelay(1500);
 
-    const username = generateUsername(data.firstName, data.mobile);
-    saveRegisterData({ username });
-
-    saveRegisteredUser(data.aadhaar, {
-      username,
-      mobile: data.mobile,
-      fullName: data.fullName,
-    });
-
+    // Registration already happened on the backend in Step 1.
+    // This step is purely a UX confirmation gate.
     saveRegistrationSuccess({
-      username,
+      username: data.username,
       fullName: data.fullName,
       mobile: data.mobile,
       email: data.email,
     });
 
-    setPendingWelcome(username);
+    setPendingWelcome(data.username);
+    clearRegisterData();
+
     router.push("/register/success");
   }
 
@@ -82,7 +67,9 @@ export default function ReviewPage() {
       subtitle="Confirm your verification status to complete registration."
     >
       <form onSubmit={handleSubmit} noValidate>
-        <p className="reg-review-intro">You&apos;re almost done. Review your verified details below.</p>
+        <p className="reg-review-intro">
+          You&apos;re almost done. Review your verified details below.
+        </p>
 
         <div className="reg-summary-grid">
           <div className="reg-summary-card">
@@ -127,7 +114,7 @@ export default function ReviewPage() {
 
         <div className="reg-username-preview reg-username-preview--premium">
           <span className="reg-username-preview__label">Your Username</span>
-          <span className="reg-username-preview__value">{usernamePreview}</span>
+          <span className="reg-username-preview__value">{data.username}</span>
         </div>
 
         <button
@@ -138,7 +125,13 @@ export default function ReviewPage() {
           <span className={`reg-confirm__box${confirmed ? " reg-confirm__box--checked" : ""}`}>
             {confirmed && (
               <svg width="11" height="9" viewBox="0 0 10 8" fill="none">
-                <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                <path
+                  d="M1 4L3.5 6.5L9 1"
+                  stroke="white"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             )}
           </span>
@@ -151,14 +144,19 @@ export default function ReviewPage() {
           onValidChange={setCaptchaValid}
         />
 
-        <button type="submit" className="reg-btn reg-btn--primary" disabled={loading || !canSubmit}>
+        <button
+          type="submit"
+          className="reg-btn reg-btn--primary"
+          disabled={loading || !canSubmit}
+          aria-busy={loading}
+        >
           {loading ? (
             <>
               <span className="reg-btn__spinner" aria-hidden="true" />
-              Submitting…
+              Finishing…
             </>
           ) : (
-            "SUBMIT REGISTRATION"
+            "COMPLETE REGISTRATION"
           )}
         </button>
       </form>

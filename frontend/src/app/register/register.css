@@ -682,6 +682,22 @@
   padding-right: 48px;
 }
 
+/* Leading icon inside input wrap */
+.reg-input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  display: flex;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.reg-input--icon {
+  padding-left: 44px;
+}
+
 .reg-input-toggle {
   position: absolute;
   right: 14px;

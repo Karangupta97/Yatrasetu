@@ -25,6 +25,10 @@ import {
   CreditCard,
 } from "lucide-react";
 import "./home.css";
+import BookingsNavbar from "@/app/my-bookings/components/BookingsNavbar";
+import HomeHeroCta from "@/components/shared/HomeHeroCta";
+
+
 
 export const metadata: Metadata = {
   title: "YatraSetu — Your Bridge to Every Journey",
@@ -60,47 +64,7 @@ function AshokaEmblem() {
   );
 }
 
-/* ── Navbar ── */
-function HomeNavbar() {
-  return (
-    <nav className="home-nav" aria-label="Main navigation">
-      <Link href="/" className="home-nav__logo-link" aria-label="YatraSetu home">
-        <div className="home-nav__logo-box" aria-hidden="true">
-          <Train size={18} color="white" strokeWidth={2.2} />
-        </div>
-        <div style={{ lineHeight: 1.2 }}>
-          <div className="home-nav__brand">
-            Yatra<span>Setu</span>
-          </div>
-          <div className="home-nav__tagline">Your bridge to every journey.</div>
-        </div>
-      </Link>
 
-      <div className="home-nav__actions">
-        <Link href="#features" className="home-nav__link" aria-label="Features section">
-          Features
-        </Link>
-        <Link href="#how-it-works" className="home-nav__link" aria-label="How it works section">
-          How It Works
-        </Link>
-        <Link
-          href="/login"
-          className="home-nav__btn home-nav__btn--ghost"
-          aria-label="Sign in to your account"
-        >
-          Sign In
-        </Link>
-        <Link
-          href="/register"
-          className="home-nav__btn home-nav__btn--primary"
-          aria-label="Create a new account"
-        >
-          Get Started
-        </Link>
-      </div>
-    </nav>
-  );
-}
 
 /* ── Hero ── */
 function Hero() {
@@ -141,24 +105,7 @@ function Hero() {
           seamless experience.
         </p>
 
-        <div className="home-hero__cta">
-          <Link
-            href="/register"
-            className="home-hero__btn home-hero__btn--primary"
-            aria-label="Create your free account"
-          >
-            <Ticket size={18} aria-hidden="true" />
-            Book Your First Ticket
-          </Link>
-          <Link
-            href="/login"
-            className="home-hero__btn home-hero__btn--outline"
-            aria-label="Sign in to your existing account"
-          >
-            Sign In
-            <ArrowRight size={16} aria-hidden="true" />
-          </Link>
-        </div>
+        <HomeHeroCta />
 
         {/* Stats chips */}
         <div className="home-hero__stats" role="list" aria-label="Platform statistics">
@@ -560,7 +507,7 @@ function Footer() {
 export default function HomePage() {
   return (
     <div className="home-page">
-      <HomeNavbar />
+      <BookingsNavbar />
       <Hero />
       <Features />
       <HowItWorks />

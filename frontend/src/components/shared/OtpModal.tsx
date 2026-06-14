@@ -11,10 +11,11 @@ interface OtpModalProps {
   title: string;
   subtitle: string;
   onClose: () => void;
-  onVerified: () => void;
+  onVerified: (otpCode: string) => Promise<void>;
+  onResend?: () => Promise<void>;
 }
 
-export default function OtpModal({ open, title, subtitle, onClose, onVerified }: OtpModalProps) {
+export default function OtpModal({ open, title, subtitle, onClose, onVerified, onResend }: OtpModalProps) {
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -43,17 +44,29 @@ export default function OtpModal({ open, title, subtitle, onClose, onVerified }:
     }
     setLoading(true);
     setError("");
-    await new Promise((r) => setTimeout(r, 1200));
-    setLoading(false);
-    onVerified();
+    try {
+      await onVerified(code);
+    } catch (err: any) {
+      setError(err?.message ?? "Verification failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
-  function handleResend() {
+  async function handleResend() {
     if (timer > 0) return;
-    setTimer(RESEND_SECONDS);
-    setOtp(Array(OTP_LENGTH).fill(""));
     setError("");
+    try {
+      if (onResend) {
+        await onResend();
+      }
+      setTimer(RESEND_SECONDS);
+      setOtp(Array(OTP_LENGTH).fill(""));
+    } catch (err: any) {
+      setError(err?.message ?? "Failed to resend OTP.");
+    }
   }
+
 
   return (
     <div className="auth-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="otp-modal-title">

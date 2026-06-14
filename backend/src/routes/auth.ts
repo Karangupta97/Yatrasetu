@@ -5,6 +5,7 @@ import User from "../models/User.js";
 import { sendEmail } from "../config/ses.js";
 import { deviceFingerprint } from "../utils/deviceFingerprint.js";
 import redisClient from "../config/redis.js";
+import { authLimiter } from "../middleware/rateLimiter.js";
 
 const router = Router();
 
@@ -68,7 +69,7 @@ async function sendVerificationOTP(
 }
 
 // ── POST /api/auth/register ───────────────────────────────────────────────────
-router.post("/register", async (req: Request, res: Response): Promise<void> => {
+router.post("/register", authLimiter, async (req: Request, res: Response): Promise<void> => {
   try {
     const { username, fullName, email, mobile, password, confirmPassword } =
       req.body as {
@@ -156,7 +157,7 @@ router.post("/register", async (req: Request, res: Response): Promise<void> => {
 
 // ── POST /api/auth/verify-email ───────────────────────────────────────────────
 // Body: { userId, otp }
-router.post("/verify-email", async (req: Request, res: Response): Promise<void> => {
+router.post("/verify-email", authLimiter, async (req: Request, res: Response): Promise<void> => {
   try {
     const { userId, otp } = req.body as { userId?: string; otp?: string };
 
@@ -198,10 +199,48 @@ router.post("/verify-email", async (req: Request, res: Response): Promise<void> 
     // Clean up OTP from Redis
     await redisClient.del(`${EMAIL_OTP_PREFIX}${userId}`);
 
-    res.status(200).json({
-      status: "success",
-      message: "Email verified successfully. You can now log in.",
-    });
+    // Same as login: set refreshToken cookie and return accessToken + user
+    const jwtSecret = process.env.JWT_SECRET;
+    const jwtRefreshSecret = process.env.JWT_REFRESH_SECRET;
+    if (!jwtSecret || !jwtRefreshSecret) throw new Error("JWT secrets not configured.");
+
+    const accessToken = jwt.sign(
+      { id: user._id.toString(), role: user.role },
+      jwtSecret,
+      { expiresIn: "15m" }
+    );
+
+    const refreshToken = jwt.sign(
+      { id: user._id.toString() },
+      jwtRefreshSecret,
+      { expiresIn: "7d" }
+    );
+
+    await redisClient.setex(`refresh:${user._id.toString()}`, 7 * 24 * 60 * 60, refreshToken);
+
+    res
+      .cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      })
+      .status(200)
+      .json({
+        status: "success",
+        message: "Email verified successfully. You are now logged in.",
+        accessToken,
+        user: {
+          id: user._id,
+          username: user.username,
+          fullName: user.fullName,
+          email: user.email,
+          mobile: user.mobile,
+          role: user.role,
+          isEmailVerified: user.isEmailVerified,
+          isAadhaarVerified: user.isAadhaarVerified,
+        },
+      });
   } catch (err) {
     console.error("Verify email error:", (err as Error).message);
     res.status(500).json({ status: "error", message: "Verification failed. Please try again." });
@@ -210,7 +249,7 @@ router.post("/verify-email", async (req: Request, res: Response): Promise<void> 
 
 // ── POST /api/auth/resend-otp ─────────────────────────────────────────────────
 // Body: { userId }
-router.post("/resend-otp", async (req: Request, res: Response): Promise<void> => {
+router.post("/resend-otp", authLimiter, async (req: Request, res: Response): Promise<void> => {
   try {
     const { userId } = req.body as { userId?: string };
 
@@ -266,7 +305,7 @@ router.post("/resend-otp", async (req: Request, res: Response): Promise<void> =>
 });
 
 // ── POST /api/auth/login ──────────────────────────────────────────────────────
-router.post("/login", async (req: Request, res: Response): Promise<void> => {
+router.post("/login", authLimiter, async (req: Request, res: Response): Promise<void> => {
   try {
     const { username, password } = req.body as {
       username?: string;
