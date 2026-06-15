@@ -35,10 +35,11 @@ function mapClass(cls: ClassAvailability): SeatClass {
 
 function makeInitial(train: TrainData, cls: ClassAvailability): BookingState {
   const seatClass = mapClass(cls);
+  const today = new Date().toISOString().split("T")[0];
   return {
     from:             train.departure.city,
     to:               train.arrival.city,
-    departDate:       train.departure.date,   // pre-filled, user can change in step 1
+    departDate:       today,   // default to current date
     returnDate:       "",
     returnEnabled:    false,
     passengers:       1,
@@ -146,77 +147,91 @@ export default function BookingOverlay({ train, selectedClass, onClose }: Props)
         style={{
           background: "#ffffff",
           borderBottom: "1px solid #e8ebed",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
-          padding: "0 24px",
-          height: "60px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
+          boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
           flexShrink: 0,
           zIndex: 10,
         }}
       >
-        {/* Left: back button + train info */}
-        <div className="flex items-center gap-4 min-w-0">
-          <button
-            onClick={onClose}
-            className="flex items-center gap-1.5 flex-shrink-0 focus:outline-none focus-visible:ring-2 rounded hover:opacity-70 transition-opacity"
-            style={{
-              fontSize: "13px", color: "#6b7280",
-              background: "none", border: "none",
-              cursor: "pointer", padding: 0,
-            }}
-            aria-label="Back to search results"
-          >
-            <ArrowLeft size={15} />
-            <span className="hidden sm:inline">Back to results</span>
-          </button>
-
-          <span aria-hidden="true" style={{ width: "1px", height: "20px", background: "#e8ebed", flexShrink: 0 }} />
-
-          <div className="hidden sm:flex items-center gap-2 min-w-0 overflow-hidden">
-            {/* Operator circle */}
-            <div
-              className="flex items-center justify-center rounded-full flex-shrink-0"
+        <div
+          className="mx-auto w-full flex items-center justify-between"
+          style={{
+            maxWidth: "1080px",
+            height: "64px",
+            padding: "0 24px",
+          }}
+        >
+          {/* Left: back button + train info */}
+          <div className="flex items-center gap-4 min-w-0">
+            <button
+              onClick={onClose}
+              className="flex items-center gap-2 flex-shrink-0 focus:outline-none focus-visible:ring-2 rounded-lg transition-all"
               style={{
-                width: "26px", height: "26px",
-                background: train.logoColor,
-                fontSize: "10px", fontWeight: 700, color: "white",
+                fontSize: "13px", color: "#6b7280",
+                background: "none", border: "1.5px solid #e8ebed",
+                borderRadius: "8px", padding: "6px 12px",
+                cursor: "pointer",
               }}
-              aria-hidden="true"
+              onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.background = "#f8fafc"; }}
+              onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.background = "none"; }}
+              aria-label="Back to search results"
             >
-              {train.initials}
-            </div>
-            <span style={{ fontSize: "14px", fontWeight: 700, color: "#181d2a", whiteSpace: "nowrap" }}>
-              {train.name}
-            </span>
-            <span style={{ fontSize: "12px", color: "#9ca3af", whiteSpace: "nowrap" }}>
-              ({train.trainNumber})
-            </span>
-            <span style={{ color: "#e8ebed" }}>·</span>
-            <span style={{ fontSize: "13px", color: "#6b7280", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-              {train.departure.city} → {train.arrival.city}
-            </span>
-          </div>
-        </div>
+              <ArrowLeft size={14} />
+              <span className="hidden sm:inline" style={{ fontWeight: 500 }}>Back to results</span>
+            </button>
 
-        {/* Right: class badge + date */}
-        <div className="flex items-center gap-3 flex-shrink-0">
-          <span
-            style={{
-              background: "rgba(116,142,254,0.10)", color: "#748efe",
-              borderRadius: "9999px", padding: "4px 12px",
-              fontSize: "12px", fontWeight: 700, whiteSpace: "nowrap",
-            }}
-          >
-            {state.selectedClass?.code} · ₹{state.selectedClass?.price.toLocaleString("en-IN")}
-          </span>
-          <div
-            className="hidden sm:flex items-center gap-1"
-            style={{ fontSize: "12px", color: "#9ca3af" }}
-          >
-            <TrainIcon size={12} aria-hidden="true" />
-            {train.departure.date}
+            <span aria-hidden="true" style={{ width: "1px", height: "24px", background: "#e8ebed", flexShrink: 0 }} />
+
+            <div className="hidden sm:flex items-center gap-2.5 min-w-0 overflow-hidden">
+              {/* Operator circle */}
+              <div
+                className="flex items-center justify-center rounded-full flex-shrink-0"
+                style={{
+                  width: "30px", height: "30px",
+                  background: train.logoColor,
+                  fontSize: "11px", fontWeight: 700, color: "white",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.12)",
+                }}
+                aria-hidden="true"
+              >
+                {train.initials}
+              </div>
+              <div className="flex flex-col min-w-0">
+                <span style={{ fontSize: "14px", fontWeight: 700, color: "#181d2a", whiteSpace: "nowrap", lineHeight: 1.2 }}>
+                  {train.name}
+                  <span style={{ fontSize: "12px", color: "#9ca3af", fontWeight: 500, marginLeft: "6px" }}>
+                    ({train.trainNumber})
+                  </span>
+                </span>
+                <span style={{ fontSize: "12px", color: "#6b7280", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", lineHeight: 1.2 }}>
+                  {train.departure.city} → {train.arrival.city}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: class badge + date */}
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <span
+              style={{
+                background: "rgba(116,142,254,0.08)", color: "#5b6efe",
+                borderRadius: "9999px", padding: "6px 14px",
+                fontSize: "12px", fontWeight: 700, whiteSpace: "nowrap",
+                border: "1px solid rgba(116,142,254,0.15)",
+              }}
+            >
+              {state.selectedClass?.code} · ₹{state.selectedClass?.price.toLocaleString("en-IN")}
+            </span>
+            <div
+              className="hidden md:flex items-center gap-1.5"
+              style={{
+                fontSize: "12px", color: "#6b7280", fontWeight: 500,
+                background: "#f8fafc", borderRadius: "8px",
+                padding: "6px 12px", border: "1px solid #e8ebed",
+              }}
+            >
+              <TrainIcon size={12} aria-hidden="true" style={{ color: "#9ca3af" }} />
+              {train.departure.date}
+            </div>
           </div>
         </div>
       </div>
@@ -224,21 +239,28 @@ export default function BookingOverlay({ train, selectedClass, onClose }: Props)
       {/* ── Scrollable body ─────────────────────────────── */}
       <div
         id="booking-overlay-scroll"
-        className="flex-1 overflow-y-auto px-4 md:px-6 lg:px-8"
-        style={{ paddingTop: "20px", paddingBottom: "48px" }}
+        className="flex-1 overflow-y-auto flex justify-center"
+        style={{ paddingBottom: "48px" }}
       >
-        <div className="mx-auto" style={{ maxWidth: "640px" }}>
+        {/* Centered container */}
+        <div
+          style={{
+            width: "100%",
+            maxWidth: "680px",
+            padding: "32px 24px 0",
+          }}
+        >
 
           {/* Step progress bar (steps 1–5; hidden on confirmation) */}
           {step < 6 && (
             <div
               style={{
                 background: "#ffffff",
-                borderRadius: "14px",
+                borderRadius: "16px",
                 border: "1px solid #e8ebed",
-                padding: "16px 20px",
-                marginBottom: "20px",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+                padding: "20px 28px",
+                marginBottom: "24px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
                 overflowX: "auto",
               }}
             >

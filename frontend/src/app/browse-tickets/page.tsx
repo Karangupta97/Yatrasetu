@@ -72,31 +72,109 @@ function filterTrains(t: TrainType[], f: Filters): TrainType[] {
 
 /* ── station list ─────────────────────────────────────────── */
 const STATIONS = [
+  // Major metros & hubs
   { code: "NDLS", name: "New Delhi" },
+  { code: "NZM",  name: "Hazrat Nizamuddin" },
+  { code: "DLI",  name: "Old Delhi" },
+  { code: "DEE",  name: "Delhi Sarai Rohilla" },
   { code: "CSMT", name: "Mumbai CSMT" },
-  { code: "BCT", name: "Mumbai Central" },
-  { code: "SBC", name: "Bengaluru KSR" },
-  { code: "MAS", name: "Chennai Central" },
-  { code: "HWH", name: "Howrah Jn" },
+  { code: "BCT",  name: "Mumbai Central" },
+  { code: "DDR",  name: "Mumbai Dadar" },
+  { code: "LTT",  name: "Mumbai Lokmanya Tilak" },
+  { code: "THANE",name: "Thane" },
+  { code: "SBC",  name: "Bengaluru KSR" },
+  { code: "YPR",  name: "Yeshwanthpur" },
+  { code: "BNC",  name: "Bengaluru City" },
+  { code: "MAS",  name: "Chennai Central" },
+  { code: "MS",   name: "Chennai Egmore" },
+  { code: "MBM",  name: "Chennai Beach" },
+  { code: "HWH",  name: "Howrah Jn" },
   { code: "KOAA", name: "Kolkata" },
   { code: "SDAH", name: "Sealdah" },
-  { code: "BPL", name: "Bhopal Jn" },
-  { code: "NGP", name: "Nagpur" },
-  { code: "JP", name: "Jaipur" },
-  { code: "ADI", name: "Ahmedabad" },
+  { code: "BPL",  name: "Bhopal Jn" },
+  { code: "NGP",  name: "Nagpur" },
+  // Rajasthan & Gujarat
+  { code: "JP",   name: "Jaipur" },
+  { code: "JU",   name: "Jodhpur Jn" },
+  { code: "UDZ",  name: "Udaipur City" },
+  { code: "AII",  name: "Ajmer Jn" },
+  { code: "BKN",  name: "Bikaner Jn" },
+  { code: "ADI",  name: "Ahmedabad" },
+  { code: "BRC",  name: "Vadodara Jn" },
+  { code: "ST",   name: "Surat" },
+  { code: "RJT",  name: "Rajkot Jn" },
+  { code: "GIMB", name: "Gandhidham" },
+  { code: "PBR",  name: "Porbandar" },
+  // Maharashtra & Pune
   { code: "PUNE", name: "Pune Jn" },
-  { code: "SC", name: "Secunderabad" },
-  { code: "BRC", name: "Vadodara" },
-  { code: "ST", name: "Surat" },
-  { code: "LKO", name: "Lucknow" },
-  { code: "CNB", name: "Kanpur Central" },
-  { code: "BSB", name: "Varanasi Jn" },
-  { code: "ASR", name: "Amritsar Jn" },
-  { code: "CDG", name: "Chandigarh" },
-  { code: "AGC", name: "Agra Cantt" },
-  { code: "KOTA", name: "Kota Jn" },
+  { code: "PNVL", name: "Panvel" },
+  { code: "NK",   name: "Nasik Road" },
+  { code: "AWB",  name: "Aurangabad" },
+  { code: "NGS",  name: "Nagpur" },
+  { code: "KOP",  name: "Kolhapur" },
+  // Telangana & Andhra
+  { code: "SC",   name: "Secunderabad Jn" },
+  { code: "HYB",  name: "Hyderabad Deccan" },
+  { code: "NZB",  name: "Nizamabad" },
   { code: "VSKP", name: "Visakhapatnam" },
-  { code: "BBS", name: "Bhubaneswar" },
+  { code: "BZA",  name: "Vijayawada Jn" },
+  { code: "GNT",  name: "Guntur Jn" },
+  { code: "TPTY", name: "Tirupati" },
+  { code: "GTL",  name: "Guntakal Jn" },
+  // Karnataka & Kerala
+  { code: "MYS",  name: "Mysuru Jn" },
+  { code: "UBL",  name: "Hubballi Jn" },
+  { code: "DWR",  name: "Dharwad" },
+  { code: "MAQ",  name: "Mangaluru Jn" },
+  { code: "TVC",  name: "Thiruvananthapuram" },
+  { code: "ERS",  name: "Ernakulam Jn" },
+  { code: "CBE",  name: "Coimbatore Jn" },
+  { code: "SA",   name: "Salem Jn" },
+  { code: "MDU",  name: "Madurai Jn" },
+  { code: "TEN",  name: "Tirunelveli Jn" },
+  // Odisha & East
+  { code: "BBS",  name: "Bhubaneswar" },
+  { code: "CTC",  name: "Cuttack" },
+  { code: "PURI", name: "Puri" },
+  { code: "ROU",  name: "Rourkela Jn" },
+  // UP, Bihar & Jharkhand
+  { code: "LKO",  name: "Lucknow NR" },
+  { code: "LJN",  name: "Lucknow Jn" },
+  { code: "CNB",  name: "Kanpur Central" },
+  { code: "BSB",  name: "Varanasi Jn" },
+  { code: "ALD",  name: "Prayagraj Jn" },
+  { code: "AGC",  name: "Agra Cantt" },
+  { code: "AF",   name: "Agra Fort" },
+  { code: "MTJ",  name: "Mathura Jn" },
+  { code: "MB",   name: "Moradabad" },
+  { code: "GZB",  name: "Ghaziabad" },
+  { code: "MFP",  name: "Muzaffarpur Jn" },
+  { code: "PNBE", name: "Patna Jn" },
+  { code: "GAYA", name: "Gaya Jn" },
+  { code: "DHN",  name: "Dhanbad Jn" },
+  { code: "RNC",  name: "Ranchi" },
+  { code: "JSME", name: "Jasidih" },
+  // Punjab, Haryana & HP
+  { code: "ASR",  name: "Amritsar Jn" },
+  { code: "CDG",  name: "Chandigarh" },
+  { code: "LDH",  name: "Ludhiana Jn" },
+  { code: "JUC",  name: "Jalandhar City" },
+  { code: "PTKC", name: "Pathankot Cantt" },
+  { code: "UMB",  name: "Ambala Cantt" },
+  { code: "RE",   name: "Rewari" },
+  { code: "GGN",  name: "Gurugram" },
+  // MP, CG
+  { code: "KOTA", name: "Kota Jn" },
+  { code: "IDH",  name: "Indore Jn" },
+  { code: "GWL",  name: "Gwalior Jn" },
+  { code: "JBP",  name: "Jabalpur" },
+  { code: "R",    name: "Raipur Jn" },
+  { code: "BSP",  name: "Bilaspur Jn" },
+  // North East & J&K
+  { code: "GHY",  name: "Guwahati" },
+  { code: "DBRG", name: "Dibrugarh" },
+  { code: "AGTL", name: "Agartala" },
+  { code: "JAT",  name: "Jammu Tawi" },
 ];
 
 function todayStr() { return new Date().toISOString().split("T")[0]; }
@@ -105,54 +183,178 @@ function fmtDate(iso: string) {
   return new Date(iso + "T00:00:00").toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" });
 }
 
+/* ── station row (shared render) ──────────────────────────── */
+function StationRow({ s, hovered, setHovered, onSelect }: {
+  s: { code: string; name: string };
+  hovered: string | null;
+  setHovered: (c: string | null) => void;
+  onSelect: (s: { code: string; name: string }) => void;
+}) {
+  const isHov = hovered === s.code;
+  return (
+    <button
+      onMouseDown={e => { e.preventDefault(); onSelect(s); }}
+      onMouseEnter={() => setHovered(s.code)}
+      onMouseLeave={() => setHovered(null)}
+      style={{
+        width: "100%", display: "flex", alignItems: "center", gap: "10px",
+        padding: "9px 14px",
+        background: isHov ? "#f0f3ff" : "transparent",
+        border: "none", cursor: "pointer", fontFamily: "inherit", textAlign: "left",
+        transition: "background 0.15s",
+      }}
+    >
+      <span style={{
+        minWidth: "42px", height: "24px", borderRadius: "6px",
+        background: isHov ? "#dde4ff" : "#eef2ff",
+        border: `1px solid ${isHov ? "#748efe" : "#c7d2fe"}`,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        fontSize: "10px", fontWeight: 800, color: "#748efe",
+        flexShrink: 0, letterSpacing: "0.04em", padding: "0 4px",
+      }}>
+        {s.code}
+      </span>
+      <span style={{ fontSize: "13.5px", fontWeight: 600, color: "#181d2a", flex: 1 }}>
+        {s.name}
+      </span>
+      {isHov && <span style={{ fontSize: "12px", color: "#748efe", fontWeight: 700 }}>↗</span>}
+    </button>
+  );
+}
+
+/* Section label inside dropdown */
+function DropdownLabel({ text }: { text: string }) {
+  return (
+    <div style={{
+      padding: "8px 14px 5px",
+      fontSize: "10px", fontWeight: 700, color: "#9ca3af",
+      textTransform: "uppercase", letterSpacing: "0.08em",
+      borderBottom: "1px solid #f3f4f6",
+    }}>
+      {text}
+    </div>
+  );
+}
+
 /* ── station autocomplete ─────────────────────────────────── */
+
+/* A fixed set of "popular" stations shown at the top when idle and as
+   "other suggestions" below matching results when the user is typing. */
+const POPULAR_CODES = ["NDLS", "CSMT", "SBC", "MAS", "HWH", "BCT", "PUNE", "SC"];
+const POPULAR = STATIONS.filter(s => POPULAR_CODES.includes(s.code));
+
 function StationInput({ label, value, onChange, icon }: {
   label: string; value: string; onChange: (v: string) => void; icon: React.ReactNode;
 }) {
   const [focused, setFocused] = useState(false);
-  const [query, setQuery] = useState(value);
+  const [query, setQuery]     = useState(value);
+  const [hovered, setHovered] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => { setQuery(value); }, [value]);
 
-  const matches = query.length > 0
-    ? STATIONS.filter(s => s.name.toLowerCase().includes(query.toLowerCase()) || s.code.toLowerCase().includes(query.toLowerCase())).slice(0, 7)
-    : STATIONS.slice(0, 7);
+  const isSearching = query.trim().length > 0;
+
+  /* Up to 6 stations that match the query */
+  const matches = isSearching
+    ? STATIONS.filter(s =>
+        s.name.toLowerCase().includes(query.toLowerCase()) ||
+        s.code.toLowerCase().includes(query.toLowerCase())
+      ).slice(0, 6)
+    : [];
+
+  /* Popular stations that are NOT already in the match list */
+  const matchCodes = new Set(matches.map(s => s.code));
+  const others = isSearching
+    ? POPULAR.filter(s => !matchCodes.has(s.code)).slice(0, 4)
+    : POPULAR;
+
+  const handleSelect = (s: { code: string; name: string }) => {
+    setQuery(s.name);
+    onChange(s.name);
+    setFocused(false);
+  };
 
   useEffect(() => {
-    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setFocused(false); };
+    const h = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setFocused(false);
+    };
     document.addEventListener("mousedown", h);
     return () => document.removeEventListener("mousedown", h);
   }, []);
 
   return (
-    <div ref={ref} style={{ position: "relative", flex: 1, minWidth: "120px" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "4px 12px" }}>
+    <div ref={ref} style={{ position: "relative", flex: 1, minWidth: "130px" }}>
+      {/* Input */}
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "6px 14px" }}>
         {icon}
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: "10px", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.07em" }}>{label}</div>
-          <input value={query}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{
+            fontSize: "10px", fontWeight: 700, color: "#748efe",
+            textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "2px",
+          }}>{label}</div>
+          <input
+            value={query}
             onChange={e => { setQuery(e.target.value); onChange(e.target.value); }}
             onFocus={() => setFocused(true)}
-            placeholder="City or station" autoComplete="off" aria-label={label}
-            style={{ background: "transparent", border: "none", outline: "none", fontSize: "14px", fontWeight: 700, color: "#0f172a", fontFamily: "inherit", width: "100%" }}
+            placeholder="City or station code"
+            autoComplete="off"
+            aria-label={label}
+            style={{
+              background: "transparent", border: "none", outline: "none",
+              fontSize: "14px", fontWeight: 700, color: "#181d2a",
+              fontFamily: "inherit", width: "100%",
+            }}
           />
         </div>
       </div>
+
+      {/* Dropdown */}
       {focused && (
-        <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, minWidth: "240px", background: "#fff", border: "1px solid #e2e8f0", borderRadius: "14px", boxShadow: "0 8px 30px rgba(15,23,42,0.12)", zIndex: 200, overflow: "hidden" }}>
-          {matches.length === 0
-            ? <div style={{ padding: "12px 16px", fontSize: "13px", color: "#94a3b8" }}>No stations found</div>
-            : matches.map(s => (
-              <button key={s.code} onMouseDown={e => { e.preventDefault(); setQuery(s.name); onChange(s.name); setFocused(false); }}
-                style={{ width: "100%", display: "flex", alignItems: "center", gap: "10px", padding: "10px 16px", background: "transparent", border: "none", cursor: "pointer", fontFamily: "inherit", textAlign: "left" }}
-                onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.background = "#f8fafc"; }}
-                onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}>
-                <span style={{ width: "36px", height: "24px", borderRadius: "6px", background: "#eff6ff", border: "1px solid #bfdbfe", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", fontWeight: 800, color: "#2563eb", flexShrink: 0 }}>{s.code}</span>
-                <span style={{ fontSize: "13px", fontWeight: 600, color: "#0f172a" }}>{s.name}</span>
-              </button>
-            ))
-          }
+        <div style={{
+          position: "absolute", top: "calc(100% + 8px)", left: 0,
+          minWidth: "270px", background: "#ffffff",
+          border: "1.5px solid #e8ebed",
+          borderRadius: "16px",
+          boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+          zIndex: 300, overflow: "hidden",
+        }}>
+
+          {isSearching ? (
+            <>
+              {/* ── Matching results ── */}
+              {matches.length > 0 ? (
+                <>
+                  <DropdownLabel text="Matching Stations" />
+                  {matches.map(s => (
+                    <StationRow key={s.code} s={s} hovered={hovered} setHovered={setHovered} onSelect={handleSelect} />
+                  ))}
+                </>
+              ) : (
+                <div style={{ padding: "14px 16px", fontSize: "13px", color: "#9ca3af" }}>
+                  No stations found
+                </div>
+              )}
+
+              {/* ── Other suggestions (popular, not in match list) ── */}
+              {others.length > 0 && (
+                <>
+                  <DropdownLabel text="Other Suggestions" />
+                  {others.map(s => (
+                    <StationRow key={s.code} s={s} hovered={hovered} setHovered={setHovered} onSelect={handleSelect} />
+                  ))}
+                </>
+              )}
+            </>
+          ) : (
+            /* ── Idle: just popular ── */
+            <>
+              <DropdownLabel text="Popular Stations" />
+              {others.map(s => (
+                <StationRow key={s.code} s={s} hovered={hovered} setHovered={setHovered} onSelect={handleSelect} />
+              ))}
+            </>
+          )}
         </div>
       )}
     </div>
@@ -164,51 +366,204 @@ function SearchRow({ defaultFrom, defaultTo, onSearch }: {
   defaultFrom: string; defaultTo: string; onSearch: (f: string, t: string) => void;
 }) {
   const [from, setFrom] = useState(defaultFrom);
-  const [to, setTo] = useState(defaultTo);
+  const [to, setTo]     = useState(defaultTo);
   const [date, setDate] = useState(todayStr());
   const [swapped, setSwap] = useState(false);
+  const [shakeError, setShakeError] = useState(false);
   const dateRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { setFrom(defaultFrom); setTo(defaultTo); }, [defaultFrom, defaultTo]);
 
   const swap = () => { setSwap(v => !v); const tmp = from; setFrom(to); setTo(tmp); };
 
+  /* Normalise for comparison — lowercase + trim */
+  const isSame = from.trim().toLowerCase() !== "" &&
+                 from.trim().toLowerCase() === to.trim().toLowerCase();
+
+  const handleSearch = () => {
+    if (isSame) {
+      /* Shake the error message to draw attention */
+      setShakeError(true);
+      setTimeout(() => setShakeError(false), 600);
+      return;
+    }
+    onSearch(from, to);
+  };
+
   return (
-    <div style={{ background: "rgba(255,255,255,0.92)", backdropFilter: "blur(12px)", border: "1.5px solid rgba(226,232,240,0.85)", borderRadius: "16px", padding: "8px 12px", display: "flex", alignItems: "center", flexWrap: "wrap", gap: 0, boxShadow: "0 4px 20px rgba(15,23,42,0.07)" }}>
-      <StationInput label="From" value={from} onChange={setFrom} icon={<MapPin size={14} style={{ color: "#2563eb", flexShrink: 0 }} />} />
-      <button onClick={swap} aria-label="Swap"
-        style={{ width: "32px", height: "32px", borderRadius: "50%", background: "linear-gradient(135deg,#1e40af,#2563eb)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "transform 0.3s", transform: `rotate(${swapped ? 180 : 0}deg)`, margin: "0 4px" }}>
-        <ArrowLeftRight size={13} color="white" strokeWidth={2.2} />
-      </button>
-      <div style={{ width: "1px", height: "32px", background: "rgba(226,232,240,0.7)", margin: "0 4px" }} />
-      <StationInput label="To" value={to} onChange={setTo} icon={<Flag size={14} style={{ color: "#2563eb", flexShrink: 0 }} />} />
-      <div style={{ width: "1px", height: "32px", background: "rgba(226,232,240,0.7)", margin: "0 4px" }} />
-      {/* Date */}
-      <div style={{ position: "relative", display: "flex", alignItems: "center", gap: "8px", padding: "4px 12px", flexShrink: 0, cursor: "pointer" }}
-        onClick={() => dateRef.current?.showPicker?.()}>
-        <CalendarDays size={14} style={{ color: "#2563eb", flexShrink: 0, pointerEvents: "none" }} />
-        <div style={{ pointerEvents: "none" }}>
-          <div style={{ fontSize: "10px", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.07em" }}>Date</div>
-          <div style={{ fontSize: "14px", fontWeight: 600, color: "#0f172a", whiteSpace: "nowrap" }}>{fmtDate(date) || "Select date"}</div>
+    <div>
+      <div style={{
+        background: "#ffffff",
+        border: `1.5px solid ${isSame ? "#f4632a" : "#e8ebed"}`,
+        borderRadius: "16px",
+        padding: "6px 10px 6px 6px",
+        display: "flex", alignItems: "center",
+        flexWrap: "wrap", gap: 0,
+        boxShadow: isSame
+          ? "0 4px 12px rgba(244,99,42,0.15)"
+          : "0 4px 12px rgba(0,0,0,0.08)",
+        transition: "border-color 0.2s, box-shadow 0.2s",
+      }}>
+        {/* FROM */}
+        <StationInput
+          label="From"
+          value={from}
+          onChange={setFrom}
+          icon={<MapPin size={15} style={{ color: isSame ? "#f4632a" : "#748efe", flexShrink: 0 }} />}
+        />
+
+        {/* SWAP */}
+        <button
+          onClick={swap}
+          aria-label="Swap departure and destination"
+          style={{
+            width: "34px", height: "34px", borderRadius: "50%",
+            background: "#181d2a", border: "none", cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            flexShrink: 0, margin: "0 4px",
+            transform: `rotate(${swapped ? 180 : 0}deg)`,
+            transition: "transform 0.3s ease, background 0.2s",
+            boxShadow: "0 2px 8px rgba(24,29,42,0.3)",
+          }}
+          onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.background = "#2d3748"; }}
+          onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.background = "#181d2a"; }}
+        >
+          <ArrowLeftRight size={14} color="white" strokeWidth={2.2} />
+        </button>
+
+        {/* Divider */}
+        <div style={{ width: "1px", height: "34px", background: "#e8ebed", margin: "0 4px", flexShrink: 0 }} />
+
+        {/* TO */}
+        <StationInput
+          label="To"
+          value={to}
+          onChange={setTo}
+          icon={<Flag size={15} style={{ color: isSame ? "#f4632a" : "#748efe", flexShrink: 0 }} />}
+        />
+
+        {/* Divider */}
+        <div style={{ width: "1px", height: "34px", background: "#e8ebed", margin: "0 6px", flexShrink: 0 }} />
+
+        {/* DATE */}
+        <div
+          style={{
+            position: "relative", display: "flex", alignItems: "center",
+            gap: "8px", padding: "6px 14px", flexShrink: 0, cursor: "pointer",
+          }}
+          onClick={() => dateRef.current?.showPicker?.()}
+        >
+          <CalendarDays size={15} style={{ color: "#748efe", flexShrink: 0, pointerEvents: "none" }} />
+          <div style={{ pointerEvents: "none" }}>
+            <div style={{
+              fontSize: "10px", fontWeight: 700, color: "#748efe",
+              textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "2px",
+            }}>Date</div>
+            <div style={{ fontSize: "14px", fontWeight: 700, color: "#181d2a", whiteSpace: "nowrap" }}>
+              {fmtDate(date) || "Select date"}
+            </div>
+          </div>
+          <input
+            ref={dateRef} type="date" value={date} min={todayStr()}
+            onChange={e => setDate(e.target.value)}
+            style={{ position: "absolute", opacity: 0, pointerEvents: "none", width: "1px", height: "1px", top: 0, left: 0 }}
+            aria-label="Journey date"
+          />
         </div>
-        <input ref={dateRef} type="date" value={date} min={todayStr()} onChange={e => setDate(e.target.value)}
-          style={{ position: "absolute", opacity: 0, pointerEvents: "none", width: "1px", height: "1px", top: 0, left: 0 }} aria-label="Journey date" />
-      </div>
-      <div style={{ width: "1px", height: "32px", background: "rgba(226,232,240,0.7)", margin: "0 4px" }} />
-      {/* Passengers */}
-      <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "4px 12px", flexShrink: 0 }}>
-        <Users size={14} style={{ color: "#2563eb" }} />
-        <div>
-          <div style={{ fontSize: "10px", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.07em" }}>Passengers</div>
-          <div style={{ fontSize: "14px", fontWeight: 600, color: "#0f172a" }}>1 Adult</div>
+
+        {/* Divider */}
+        <div style={{ width: "1px", height: "34px", background: "#e8ebed", margin: "0 6px", flexShrink: 0 }} />
+
+        {/* PASSENGERS */}
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "6px 14px", flexShrink: 0 }}>
+          <Users size={15} style={{ color: "#748efe" }} />
+          <div>
+            <div style={{
+              fontSize: "10px", fontWeight: 700, color: "#748efe",
+              textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "2px",
+            }}>Passengers</div>
+            <div style={{ fontSize: "14px", fontWeight: 700, color: "#181d2a" }}>1 Adult</div>
+          </div>
         </div>
+
+        {/* SEARCH BUTTON */}
+        <button
+          onClick={handleSearch}
+          style={{
+            marginLeft: "8px",
+            background: isSame ? "#e5e7eb" : "#181d2a",
+            border: "none", borderRadius: "12px",
+            padding: "11px 22px",
+            color: isSame ? "#9ca3af" : "white",
+            fontSize: "14px", fontWeight: 700,
+            cursor: isSame ? "not-allowed" : "pointer",
+            display: "flex", alignItems: "center", gap: "7px",
+            fontFamily: "inherit",
+            boxShadow: isSame ? "none" : "0 4px 12px rgba(24,29,42,0.30)",
+            transition: "background 0.2s, box-shadow 0.2s, color 0.2s",
+            flexShrink: 0,
+          }}
+          onMouseOver={e => {
+            if (isSame) return;
+            const btn = e.currentTarget as HTMLButtonElement;
+            btn.style.background = "#2d3748";
+            btn.style.boxShadow = "0 6px 16px rgba(24,29,42,0.4)";
+          }}
+          onMouseOut={e => {
+            if (isSame) return;
+            const btn = e.currentTarget as HTMLButtonElement;
+            btn.style.background = "#181d2a";
+            btn.style.boxShadow = "0 4px 12px rgba(24,29,42,0.30)";
+          }}
+          aria-disabled={isSame}
+        >
+          <Search size={14} strokeWidth={2.5} /> Search
+        </button>
       </div>
-      <button onClick={() => onSearch(from, to)}
-        style={{ marginLeft: "8px", background: "linear-gradient(135deg,#1e40af,#2563eb)", border: "none", borderRadius: "12px", padding: "10px 22px", color: "white", fontSize: "14px", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: "7px", fontFamily: "inherit", boxShadow: "0 4px 12px rgba(37,99,235,0.30)", transition: "filter 0.2s", flexShrink: 0 }}
-        onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.filter = "brightness(1.08)"; }}
-        onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.filter = "brightness(1)"; }}>
-        <Search size={14} strokeWidth={2.5} /> Search
-      </button>
+
+      {/* ── Same-station error banner ── */}
+      {isSame && (
+        <div
+          role="alert"
+          style={{
+            marginTop: "8px",
+            display: "flex", alignItems: "center", gap: "8px",
+            background: "#fff5f0",
+            border: "1.5px solid #f4632a",
+            borderRadius: "10px",
+            padding: "9px 14px",
+            animation: shakeError ? "ys-shake 0.5s ease" : "ys-slideDown 0.2s ease",
+          }}
+        >
+          {/* Icon */}
+          <span style={{
+            width: "20px", height: "20px", borderRadius: "50%",
+            background: "#f4632a", color: "#fff",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: "12px", fontWeight: 900, flexShrink: 0,
+          }}>!</span>
+          <span style={{ fontSize: "13px", fontWeight: 600, color: "#c2410c" }}>
+            Departure and destination can&apos;t be the same station.
+          </span>
+          <span style={{ fontSize: "12px", color: "#f4632a", marginLeft: "auto", whiteSpace: "nowrap" }}>
+            Please choose a different station.
+          </span>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes ys-slideDown {
+          from { opacity: 0; transform: translateY(-6px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes ys-shake {
+          0%, 100% { transform: translateX(0); }
+          20%       { transform: translateX(-6px); }
+          40%       { transform: translateX(6px); }
+          60%       { transform: translateX(-4px); }
+          80%       { transform: translateX(4px); }
+        }
+      `}</style>
     </div>
   );
 }
@@ -272,11 +627,11 @@ function PassengerPageInner() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(180deg,#f8faff 0%,#eef4ff 100%)", fontFamily: "'Google Sans','Inter',system-ui,sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: "#f0f2f5", fontFamily: "'Google Sans','Inter',system-ui,sans-serif" }}>
       <BookingsNavbar />
 
       {/* Search bar — sticky */}
-      <div style={{ background: "rgba(255,255,255,0.85)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(226,232,240,0.7)", position: "sticky", top: "64px", zIndex: 40 }}>
+      <div style={{ background: "#ffffff", borderBottom: "1px solid #e8ebed", position: "sticky", top: "64px", zIndex: 40 }}>
         <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "10px 24px" }}>
           <SearchRow defaultFrom={from} defaultTo={to} onSearch={handleSearch} />
         </div>

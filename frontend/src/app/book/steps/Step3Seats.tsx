@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Train as TrainIcon, CreditCard } from "lucide-react";
 import StepCard, { NavButtons } from "../components/StepCard";
 import { BookingState, Seat, SeatStatus, Coach } from "../types";
 
@@ -45,7 +46,6 @@ export default function Step3Seats({
   const selectedCount = state.selectedSeats.length;
 
   // Auto-assign seats whenever coach or required count changes
-  // so the "Continue" button is never blocked by the missing grid.
   useEffect(() => {
     const available = coach.seats.filter((s) => s.status === "available");
     const assigned  = available.slice(0, required).map((s) => ({
@@ -61,91 +61,91 @@ export default function Step3Seats({
   return (
     <StepCard>
       {/* Header */}
-      <div className="flex items-center justify-between mb-2">
-        <h2 style={{ fontSize: "20px", fontWeight: 700, color: "#181d2a" }}>Select Seats</h2>
+      <div className="flex items-center justify-between" style={{ marginBottom: "8px" }}>
+        <h2 style={{ fontSize: "22px", fontWeight: 800, color: "#0f172a", letterSpacing: "-0.01em" }}>
+          Select Coach
+        </h2>
         <span
           style={{
-            fontSize: "13px", color: "#6b7280",
-            background: "#f0f2f5", borderRadius: "9999px", padding: "4px 12px",
+            fontSize: "12px", fontWeight: 700, color: "#5b6efe",
+            background: "rgba(91,110,254,0.08)", border: "1px solid rgba(91,110,254,0.15)",
+            borderRadius: "9999px", padding: "5px 14px",
           }}
         >
-          {selectedCount}/{required} selected
+          {selectedCount}/{required} seat{required !== 1 ? "s" : ""}
         </span>
       </div>
-      <p style={{ fontSize: "14px", color: "#9ca3af", marginBottom: "20px" }}>
+      <p style={{ fontSize: "14px", color: "#64748b", marginBottom: "24px", lineHeight: 1.5 }}>
         {state.selectedClass?.label} · {state.from} → {state.to}
       </p>
 
       {/* Coach tabs */}
-      <div className="flex items-center gap-2 mb-5 overflow-x-auto pb-1">
-        {MOCK_COACHES.map((c) => (
-          <button
-            key={c.id}
-            onClick={() => setActiveCoach(c.id)}
-            className="flex-shrink-0 focus:outline-none focus-visible:ring-2 rounded-lg transition-all"
-            style={{
-              padding: "8px 16px", borderRadius: "10px",
-              fontSize: "13px", fontWeight: 600,
-              border: `2px solid ${activeCoach === c.id ? "#748efe" : "#e8ebed"}`,
-              background: activeCoach === c.id ? "rgba(116,142,254,0.08)" : "#ffffff",
-              color: activeCoach === c.id ? "#748efe" : "#6b7280",
-              cursor: "pointer",
-            }}
-            aria-pressed={activeCoach === c.id}
-          >
-            {c.name} · {c.type}
-          </button>
-        ))}
+      <div
+        className="flex items-center gap-2 overflow-x-auto pb-2"
+        style={{ marginBottom: "24px", scrollbarWidth: "none" }}
+      >
+        {MOCK_COACHES.map((c) => {
+          const isActive = activeCoach === c.id;
+          return (
+            <button
+              key={c.id}
+              onClick={() => setActiveCoach(c.id)}
+              className="flex-shrink-0 focus:outline-none focus-visible:ring-2 transition-all"
+              style={{
+                padding: "10px 18px", borderRadius: "12px",
+                fontSize: "13px", fontWeight: 600,
+                border: isActive ? "2px solid #5b6efe" : "1.5px solid #e2e8f0",
+                background: isActive ? "rgba(91,110,254,0.06)" : "#ffffff",
+                color: isActive ? "#5b6efe" : "#64748b",
+                cursor: "pointer",
+                boxShadow: isActive ? "0 2px 8px rgba(91,110,254,0.15)" : "0 1px 3px rgba(0,0,0,0.04)",
+              }}
+              aria-pressed={isActive}
+            >
+              <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                <TrainIcon size={13} />
+                {c.name} · {c.type}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Auto-assigned seats summary */}
-      {state.selectedSeats.length > 0 && (
-        <div
-          style={{
-            background: "#f0fdf4", border: "1px solid #bbf7d0",
-            borderRadius: "10px", padding: "14px 16px", marginBottom: "16px",
-          }}
-        >
-          <p style={{ fontSize: "12px", fontWeight: 700, color: "#9ca3af", letterSpacing: "0.05em", marginBottom: "8px" }}>
-            ASSIGNED SEATS
-          </p>
-          <div className="flex items-center gap-2 flex-wrap">
-            {state.selectedSeats.map((s) => (
-              <span
-                key={s.id}
-                style={{
-                  background: "#748efe", color: "white",
-                  borderRadius: "8px", padding: "4px 10px",
-                  fontSize: "12px", fontWeight: 700,
-                }}
-              >
-                {s.number} ({s.type})
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Fare update */}
+      {/* Fare summary */}
       {state.selectedClass && (
         <div
           style={{
-            background: "#f8faff", border: "1px solid #dbeafe",
-            borderRadius: "10px", padding: "12px 16px",
+            background: "linear-gradient(135deg, #f8faff 0%, #f0f4ff 100%)",
+            border: "1px solid #e0e7ff",
+            borderRadius: "14px", padding: "18px 20px",
           }}
         >
           <div className="flex items-center justify-between">
-            <span style={{ fontSize: "13px", color: "#6b7280" }}>
-              {selectedCount} seat{selectedCount !== 1 ? "s" : ""} × ₹{state.selectedClass.price.toLocaleString("en-IN")}
-            </span>
-            <span style={{ fontSize: "16px", fontWeight: 700, color: "#748efe" }}>
+            <div className="flex items-center gap-3">
+              <div
+                style={{
+                  width: "36px", height: "36px", borderRadius: "10px",
+                  background: "rgba(91,110,254,0.08)", border: "1px solid #e0e7ff",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}
+              >
+                <CreditCard size={16} style={{ color: "#5b6efe" }} />
+              </div>
+              <div>
+                <p style={{ fontSize: "12px", color: "#94a3b8", fontWeight: 600 }}>Total Fare</p>
+                <p style={{ fontSize: "13px", color: "#64748b" }}>
+                  {selectedCount} seat{selectedCount !== 1 ? "s" : ""} × ₹{state.selectedClass.price.toLocaleString("en-IN")}
+                </p>
+              </div>
+            </div>
+            <span style={{ fontSize: "20px", fontWeight: 800, color: "#5b6efe" }}>
               ₹{(selectedCount * state.selectedClass.price).toLocaleString("en-IN")}
             </span>
           </div>
         </div>
       )}
 
-      <NavButtons onBack={onBack} onNext={handleNext} nextLabel="Confirm →" />
+      <NavButtons onBack={onBack} onNext={handleNext} nextLabel="Continue →" />
     </StepCard>
   );
 }

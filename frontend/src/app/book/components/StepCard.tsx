@@ -10,10 +10,10 @@ export default function StepCard({
       className={className}
       style={{
         background: "#ffffff",
-        borderRadius: "16px",
+        borderRadius: "20px",
         border: "1px solid #e8ebed",
-        boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
-        padding: "28px",
+        boxShadow: "0 4px 20px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.03)",
+        padding: "36px 40px",
         width: "100%",
       }}
     >
@@ -127,16 +127,18 @@ export function NavButtons({
   loading?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between mt-6 pt-5" style={{ borderTop: "1px solid #f3f4f6" }}>
+    <div className="flex items-center justify-between mt-8 pt-6" style={{ borderTop: "1px solid #f0f1f3" }}>
       {onBack ? (
         <button
           onClick={onBack}
-          className="flex items-center gap-2 focus:outline-none focus-visible:ring-2 rounded-lg hover:bg-gray-50 transition-colors"
+          className="flex items-center gap-2 focus:outline-none focus-visible:ring-2 rounded-lg transition-all"
           style={{
-            padding: "10px 20px", fontSize: "14px", fontWeight: 600,
+            padding: "11px 22px", fontSize: "14px", fontWeight: 600,
             color: "#6b7280", border: "1.5px solid #e8ebed", borderRadius: "10px",
             background: "#ffffff", cursor: "pointer",
           }}
+          onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.background = "#f8fafc"; (e.currentTarget as HTMLButtonElement).style.borderColor = "#d1d5db"; }}
+          onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.background = "#ffffff"; (e.currentTarget as HTMLButtonElement).style.borderColor = "#e8ebed"; }}
         >
           ← Back
         </button>
@@ -145,15 +147,18 @@ export function NavButtons({
       <button
         onClick={onNext}
         disabled={nextDisabled || loading}
-        className="flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 hover:opacity-90 active:scale-[0.97] transition-all"
+        className="flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 active:scale-[0.97] transition-all"
         style={{
-          padding: "12px 28px", fontSize: "14px", fontWeight: 700,
-          background: nextDisabled ? "#e8ebed" : "#748efe",
+          padding: "13px 32px", fontSize: "14px", fontWeight: 700,
+          background: nextDisabled ? "#e8ebed" : "linear-gradient(135deg, #5b6efe 0%, #748efe 100%)",
           color: nextDisabled ? "#9ca3af" : "white",
-          borderRadius: "10px", border: "none",
+          borderRadius: "12px", border: "none",
           cursor: nextDisabled ? "not-allowed" : "pointer",
-          minWidth: "140px",
+          minWidth: "160px", justifyContent: "center",
+          boxShadow: nextDisabled ? "none" : "0 4px 14px rgba(116,142,254,0.35)",
         }}
+        onMouseOver={e => { if (!nextDisabled) (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 6px 20px rgba(116,142,254,0.45)"; }}
+        onMouseOut={e => { if (!nextDisabled) (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 4px 14px rgba(116,142,254,0.35)"; }}
       >
         {loading ? (
           <span className="flex items-center gap-2">

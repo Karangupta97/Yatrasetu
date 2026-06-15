@@ -18,16 +18,21 @@ export default function StepIndicator({ current }: { current: number }) {
         return (
           <div key={step.n} className="flex items-center">
             {/* Step dot */}
-            <div className="flex flex-col items-center gap-1">
+            <div className="flex flex-col items-center gap-1.5">
               <div
                 className="flex items-center justify-center flex-shrink-0"
                 style={{
-                  width: "32px", height: "32px", borderRadius: "50%",
-                  background: done ? "#748efe" : active ? "#748efe" : "#e8ebed",
+                  width: "34px", height: "34px", borderRadius: "50%",
+                  background: done
+                    ? "linear-gradient(135deg, #5b6efe, #748efe)"
+                    : active
+                    ? "linear-gradient(135deg, #5b6efe, #748efe)"
+                    : "#f1f5f9",
                   color: done || active ? "white" : "#9ca3af",
                   fontSize: "13px", fontWeight: 700,
-                  boxShadow: active ? "0 0 0 4px rgba(116,142,254,0.2)" : "none",
-                  transition: "all 0.2s ease",
+                  boxShadow: active ? "0 0 0 4px rgba(116,142,254,0.18), 0 2px 8px rgba(116,142,254,0.25)" : done ? "0 2px 6px rgba(116,142,254,0.2)" : "none",
+                  transition: "all 0.25s ease",
+                  border: !done && !active ? "1.5px solid #e2e8f0" : "none",
                 }}
                 aria-current={active ? "step" : undefined}
                 aria-label={`Step ${step.n}: ${step.label}${done ? " (completed)" : active ? " (current)" : ""}`}
@@ -36,9 +41,10 @@ export default function StepIndicator({ current }: { current: number }) {
               </div>
               <span
                 style={{
-                  fontSize: "11px", fontWeight: active ? 600 : 400,
-                  color: active ? "#748efe" : done ? "#181d2a" : "#9ca3af",
+                  fontSize: "11px", fontWeight: active ? 700 : done ? 500 : 400,
+                  color: active ? "#5b6efe" : done ? "#181d2a" : "#9ca3af",
                   whiteSpace: "nowrap",
+                  transition: "color 0.2s",
                 }}
               >
                 {step.label}
@@ -50,9 +56,10 @@ export default function StepIndicator({ current }: { current: number }) {
               <div
                 aria-hidden="true"
                 style={{
-                  height: "2px", width: "40px", flexShrink: 0,
-                  background: done ? "#748efe" : "#e8ebed",
-                  margin: "0 4px", marginBottom: "18px",
+                  height: "2.5px", width: "44px", flexShrink: 0,
+                  background: done ? "linear-gradient(90deg, #5b6efe, #748efe)" : "#e8ebed",
+                  margin: "0 6px", marginBottom: "20px",
+                  borderRadius: "2px",
                   transition: "background 0.3s ease",
                 }}
               />
