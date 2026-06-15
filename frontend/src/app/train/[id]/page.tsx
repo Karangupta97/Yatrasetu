@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useState, useEffect } from "react";
 import Link from "next/link";
 import {
   ArrowLeft, Train, MapPin, Clock, Star, Wifi, WifiOff,
@@ -8,7 +8,7 @@ import {
   RefreshCw, Radio, AlertCircle, CheckCircle2, Circle,
   Accessibility, TrendingUp,
 } from "lucide-react";
-import { TRAINS } from "../../browse-tickets/data/trains";
+import { fetchTrains, Train as TrainData } from "../../browse-tickets/data/trains";
 import BookingsNavbar from "../../my-bookings/components/BookingsNavbar";
 
 /* ─── Helpers ────────────────────────────────────────────── */
@@ -51,11 +51,34 @@ export default function TrainDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const train = TRAINS.find((t) => t.id === id);
 
+  const [train, setTrain] = useState<TrainData | null | undefined>(undefined);
   const [showAllStops, setShowAllStops] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState("Just now");
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchTrains(new Date()).then(trains => {
+      if (!cancelled) {
+        setTrain(trains.find(t => t.id === id) ?? null);
+      }
+    });
+    return () => { cancelled = true; };
+  }, [id]);
+
+  if (train === undefined) {
+    return (
+      <div style={{ minHeight: "100vh", background: "#f0f2f5" }}>
+        <BookingsNavbar />
+        <div className="flex flex-col items-center justify-center" style={{ minHeight: "60vh", gap: "16px" }}>
+          <div style={{ width: "40px", height: "40px", borderRadius: "50%", border: "3px solid #e2e8f0", borderTopColor: "#748efe", animation: "spin 0.65s linear infinite" }} />
+          <p style={{ fontSize: "14px", color: "#94a3b8", fontWeight: 500 }}>Loading train details…</p>
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+      </div>
+    );
+  }
 
   if (!train) {
     return (

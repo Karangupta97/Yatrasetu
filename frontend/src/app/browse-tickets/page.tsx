@@ -17,7 +17,7 @@ import { searchTrains } from "./data/searchTrains";
 
 /* ── defaults ─────────────────────────────────────────────── */
 const DEFAULT_FILTERS: Filters = {
-  seatClasses: [], priceMin: 1000, priceMax: 5000,
+  seatClasses: [], priceMin: 0, priceMax: 10000,
   fromTime: { hour: 7, minute: 0, period: "AM" },
   toTime: { hour: 6, minute: 0, period: "PM" },
   trainTypes: [], amenities: [],
@@ -596,9 +596,9 @@ function PassengerPageInner() {
   const [from, setFrom] = useState(params.get("from") ?? "New Delhi");
   const [to, setTo] = useState(params.get("to") ?? "Mumbai CSMT");
 
-  const [routeTrains, setRouteTrains] = useState<TrainType[]>(() => searchTrains(from, to).trains);
-  const [routeMatched, setRouteMatched] = useState<boolean>(() => searchTrains(from, to).matched);
-  const [loading, setLoading] = useState(false);
+  const [routeTrains, setRouteTrains] = useState<TrainType[]>([]);
+  const [routeMatched, setRouteMatched] = useState<boolean>(false);
+  const [loading, setLoading] = useState(true);
 
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [appliedFilters, setAppliedFilters] = useState<Filters>(DEFAULT_FILTERS);
@@ -607,6 +607,22 @@ function PassengerPageInner() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [bookingTrain, setBookingTrain] = useState<TrainType | null>(null);
   const [bookingClass, setBookingClass] = useState<ClassAvailability | null>(null);
+
+  /* ── Load trains on mount ── */
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      const r = await searchTrains(from, to, new Date());
+      if (!cancelled) {
+        setRouteTrains(r.trains);
+        setRouteMatched(r.matched);
+        setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const displayed = useMemo(
     () => sortTrains(filterTrains(routeTrains, appliedFilters), sort),
@@ -617,13 +633,12 @@ function PassengerPageInner() {
     setFrom(f); setTo(t);
     setFilters(DEFAULT_FILTERS); setAppliedFilters(DEFAULT_FILTERS);
     setLoading(true);
-    setTimeout(() => {
-      const r = searchTrains(f, t);
+    searchTrains(f, t, new Date()).then(r => {
       setRouteTrains(r.trains);
       setRouteMatched(r.matched);
       setLoading(false);
       setFadeKey(k => k + 1);
-    }, 600);
+    });
   };
 
   return (
@@ -681,7 +696,7 @@ function PassengerPageInner() {
                 <Train size={40} style={{ color: "#cbd5e1", margin: "0 auto 14px", display: "block" }} />
                 <p style={{ fontSize: "16px", fontWeight: 700, color: "#0f172a", marginBottom: "6px" }}>No trains found for this route</p>
                 <p style={{ fontSize: "13px", color: "#94a3b8", marginBottom: "16px" }}>Try different stations or date</p>
-                <p style={{ fontSize: "11px", color: "#cbd5e1" }}>Supported: Delhi ↔ Mumbai · Mumbai ↔ Bengaluru · Delhi ↔ Bengaluru · Delhi ↔ Chennai · Mumbai ↔ Kolkata</p>
+                <p style={{ fontSize: "11px", color: "#cbd5e1" }}>6800+ trains across 1600+ routes · 77 stations covered across India</p>
               </div>
             ) : displayed.length === 0 ? (
               <div style={{ background: "#fff", border: "1.5px solid #e2e8f0", borderRadius: "16px", padding: "56px 32px", textAlign: "center", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>

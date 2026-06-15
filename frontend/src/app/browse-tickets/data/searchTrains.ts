@@ -1,27 +1,31 @@
-import { TRAINS, Train } from "./trains";
+import { Train, fetchTrains, fetchAliases } from "./trains";
 
-const ALIASES: Record<string, string> = {
-  "new delhi":"NDLS","delhi":"NDLS","ndls":"NDLS","new delhi (ndls)":"NDLS",
-  "mumbai":"MUMBAI","mumbai csmt":"MUMBAI","csmt":"MUMBAI","mumbai central":"MUMBAI",
-  "bct":"MUMBAI","cstm":"MUMBAI","mumbai cstm":"MUMBAI","bombay":"MUMBAI",
-  "bengaluru":"SBC","bangalore":"SBC","sbc":"SBC","ksr bengaluru":"SBC",
-  "bengaluru city":"SBC","bengaluru ksr":"SBC","blr":"SBC",
-  "chennai":"MAS","chennai central":"MAS","mas":"MAS",
-  "kolkata":"HWH","howrah":"HWH","hwh":"HWH","howrah jn":"HWH","sealdah":"HWH","sdah":"HWH",
-  "bhopal":"BPL","bhopal jn":"BPL","bpl":"BPL",
-};
-
-export function normalise(input: string): string | null {
-  return ALIASES[input.trim().toLowerCase()] ?? null;
+export async function normalise(input: string): Promise<string | null> {
+  const aliases = await fetchAliases();
+  return aliases[input.trim().toLowerCase()] ?? null;
 }
 
-export function searchTrains(from: string, to: string): {
-  trains: Train[]; fromKey: string | null; toKey: string | null; matched: boolean;
-} {
-  const fromKey = normalise(from);
-  const toKey   = normalise(to);
+export async function searchTrains(
+  from: string,
+  to: string,
+  journeyDate?: Date
+): Promise<{
+  trains: Train[];
+  fromKey: string | null;
+  toKey: string | null;
+  matched: boolean;
+}> {
+  const aliases = await fetchAliases();
+  const fromKey = aliases[from.trim().toLowerCase()] ?? null;
+  const toKey = aliases[to.trim().toLowerCase()] ?? null;
+
   if (!fromKey || !toKey || fromKey === toKey)
     return { trains: [], fromKey, toKey, matched: false };
-  const trains = TRAINS.filter(t => t.originKey === fromKey && t.destinationKey === toKey);
-  return { trains, fromKey, toKey, matched: true };
+
+  const allTrains = await fetchTrains(journeyDate);
+  const trains = allTrains.filter(
+    (t) => t.originKey === fromKey && t.destinationKey === toKey
+  );
+
+  return { trains, fromKey, toKey, matched: trains.length > 0 };
 }
